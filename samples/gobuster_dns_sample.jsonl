@@ -1,0 +1,4 @@
+{"subdomain":"www.lab.local","ip":"192.168.56.101"}
+{"subdomain":"mail.lab.local","ip":"192.168.56.105"}
+{"subdomain":"dev.lab.local","ip":"192.168.56.110"}
+{"subdomain":"admin.lab.local","ip":"192.168.56.101"}

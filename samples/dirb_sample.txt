@@ -1,0 +1,36 @@
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Mon Jun 13 18:25:00 2024
+URL_BASE: http://192.168.56.101/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612
+
+---- Scanning URL: http://192.168.56.101/ ----
++ http://192.168.56.101/index.php (CODE:200|SIZE:52846)
++ http://192.168.56.101/license.txt (CODE:200|SIZE:19935)
++ http://192.168.56.101/readme.html (CODE:200|SIZE:7401)
++ http://192.168.56.101/wp-login.php (CODE:200|SIZE:6731)
++ http://192.168.56.101/xmlrpc.php (CODE:200|SIZE:42)
+==> DIRECTORY: http://192.168.56.101/wp-admin/
+==> DIRECTORY: http://192.168.56.101/wp-content/
+==> DIRECTORY: http://192.168.56.101/wp-includes/
+
+---- Entering directory: http://192.168.56.101/wp-admin/ ----
++ http://192.168.56.101/wp-admin/index.php (CODE:200|SIZE:3578)
++ http://192.168.56.101/wp-admin/about.php (CODE:302|SIZE:0)
+
+---- Entering directory: http://192.168.56.101/wp-content/ ----
++ http://192.168.56.101/wp-content/index.php (CODE:200|SIZE:0)
+==> DIRECTORY: http://192.168.56.101/wp-content/plugins/
+==> DIRECTORY: http://192.168.56.101/wp-content/themes/
+
+-----------------
+END_TIME: Mon Jun 13 18:25:42 2024
+DOWNLOADED: 13836 - FOUND: 12

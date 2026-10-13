@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+venv/
+.venv/
+
+# Datos generados por ARES (pueden contener información de objetivos reales)
+*.db
+*.sqlite
+evidencias/
+reportes/salida/
+hallazgos_*.csv
+reporte_*.html
+INFORME_*.html
+
+# VPN y credenciales
+*.ovpn
+.env
+.env.*
+
+# Documentos de la tesis y material de terceros
+*.docx
+*.pdf
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

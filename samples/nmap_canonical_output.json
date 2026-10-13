@@ -1,0 +1,257 @@
+{
+  "scan_metadata": {
+    "scan_id": "54cceebe-db4c-4028-8510-70634cb65f8b",
+    "tool": "nmap",
+    "command": "nmap -sV -sC -O -oX scan_output.xml 192.168.56.0/24",
+    "started_at": "2024-06-13T17:33:20+00:00",
+    "tool_version": "7.94SVN",
+    "finished_at": "2024-06-13T17:36:40+00:00",
+    "scan_type": "syn",
+    "target_spec": "192.168.56.0/24"
+  },
+  "hosts": [
+    {
+      "ip": "192.168.56.101",
+      "hostnames": [
+        "webserver.lab.local",
+        "www.lab.local"
+      ],
+      "state": "up",
+      "os": {
+        "name": "Linux 5.4 - 5.15",
+        "family": "Linux",
+        "accuracy": 95,
+        "cpe": "cpe:/o:linux:linux_kernel:5"
+      },
+      "services": [
+        {
+          "port": 22,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "ssh",
+          "product": "OpenSSH",
+          "version": "8.9p1",
+          "extra_info": "Ubuntu Linux; protocol 2.0",
+          "cpe": [
+            "cpe:/a:openbsd:openssh:8.9p1"
+          ],
+          "banner": "OpenSSH 8.9p1",
+          "scripts": [
+            {
+              "script_id": "ssh-hostkey",
+              "output": "256 SHA256:abc123def456 (ECDSA)\n  256 SHA256:xyz789ghi012 (ED25519)"
+            }
+          ]
+        },
+        {
+          "port": 80,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "http",
+          "product": "Apache httpd",
+          "version": "2.4.52",
+          "extra_info": "(Ubuntu)",
+          "cpe": [
+            "cpe:/a:apache:http_server:2.4.52"
+          ],
+          "banner": "Apache httpd 2.4.52",
+          "scripts": [
+            {
+              "script_id": "http-title",
+              "output": "Lab WordPress Site"
+            },
+            {
+              "script_id": "http-server-header",
+              "output": "Apache/2.4.52 (Ubuntu)"
+            }
+          ]
+        },
+        {
+          "port": 443,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "https",
+          "product": "Apache httpd",
+          "version": "2.4.52",
+          "extra_info": "(Ubuntu); tunnel: ssl",
+          "cpe": [
+            "cpe:/a:apache:http_server:2.4.52"
+          ],
+          "banner": "Apache httpd 2.4.52",
+          "scripts": [
+            {
+              "script_id": "ssl-cert",
+              "output": "Subject: commonName=webserver.lab.local\nIssuer: commonName=Lab CA"
+            }
+          ]
+        },
+        {
+          "port": 3306,
+          "protocol": "tcp",
+          "state": "filtered",
+          "service_name": "mysql",
+          "product": null,
+          "version": null,
+          "extra_info": null,
+          "cpe": [],
+          "banner": null,
+          "scripts": []
+        }
+      ],
+      "technologies": [],
+      "findings": [],
+      "endpoints": []
+    },
+    {
+      "ip": "192.168.56.102",
+      "hostnames": [
+        "dbserver.lab.local"
+      ],
+      "state": "up",
+      "os": {
+        "name": "Linux 5.15",
+        "family": "Linux",
+        "accuracy": 98,
+        "cpe": "cpe:/o:linux:linux_kernel:5.15"
+      },
+      "services": [
+        {
+          "port": 22,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "ssh",
+          "product": "OpenSSH",
+          "version": "9.0p1",
+          "extra_info": "Debian",
+          "cpe": [
+            "cpe:/a:openbsd:openssh:9.0p1"
+          ],
+          "banner": "OpenSSH 9.0p1",
+          "scripts": []
+        },
+        {
+          "port": 5432,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "postgresql",
+          "product": "PostgreSQL",
+          "version": "15.2",
+          "extra_info": null,
+          "cpe": [
+            "cpe:/a:postgresql:postgresql:15.2"
+          ],
+          "banner": "PostgreSQL 15.2",
+          "scripts": [
+            {
+              "script_id": "pgsql-brute",
+              "output": "No valid credentials found"
+            }
+          ]
+        }
+      ],
+      "technologies": [],
+      "findings": [],
+      "endpoints": []
+    },
+    {
+      "ip": "192.168.56.103",
+      "hostnames": [
+        "winserver.lab.local"
+      ],
+      "state": "up",
+      "os": {
+        "name": "Microsoft Windows Server 2019",
+        "family": "Windows",
+        "accuracy": 92,
+        "cpe": "cpe:/o:microsoft:windows_server_2019"
+      },
+      "services": [
+        {
+          "port": 80,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "http",
+          "product": "Microsoft IIS httpd",
+          "version": "10.0",
+          "extra_info": null,
+          "cpe": [
+            "cpe:/a:microsoft:iis:10.0"
+          ],
+          "banner": "Microsoft IIS httpd 10.0",
+          "scripts": [
+            {
+              "script_id": "http-title",
+              "output": "IIS Windows Server"
+            },
+            {
+              "script_id": "http-methods",
+              "output": "OPTIONS GET HEAD POST TRACE"
+            }
+          ]
+        },
+        {
+          "port": 135,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "msrpc",
+          "product": "Microsoft Windows RPC",
+          "version": null,
+          "extra_info": null,
+          "cpe": [],
+          "banner": "Microsoft Windows RPC",
+          "scripts": []
+        },
+        {
+          "port": 3389,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "ms-wbt-server",
+          "product": "Microsoft Terminal Services",
+          "version": null,
+          "extra_info": null,
+          "cpe": [
+            "cpe:/o:microsoft:windows"
+          ],
+          "banner": "Microsoft Terminal Services",
+          "scripts": [
+            {
+              "script_id": "rdp-ntlm-info",
+              "output": "Target_Name: WINSERVER\nNetBIOS_Domain_Name: LAB\nDNS_Computer_Name: winserver.lab.local"
+            }
+          ]
+        },
+        {
+          "port": 445,
+          "protocol": "tcp",
+          "state": "open",
+          "service_name": "microsoft-ds",
+          "product": "Microsoft Windows SMB",
+          "version": null,
+          "extra_info": null,
+          "cpe": [],
+          "banner": "Microsoft Windows SMB",
+          "scripts": [
+            {
+              "script_id": "smb2-security-mode",
+              "output": "Message signing enabled but not required"
+            }
+          ]
+        }
+      ],
+      "technologies": [],
+      "findings": [],
+      "endpoints": []
+    },
+    {
+      "ip": "192.168.56.200",
+      "hostnames": [],
+      "state": "down",
+      "os": null,
+      "services": [],
+      "technologies": [],
+      "findings": [],
+      "endpoints": []
+    }
+  ],
+  "schema_version": "1.0.0"
+}

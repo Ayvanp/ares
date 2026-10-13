@@ -1,0 +1,8 @@
+# Dependencias de ARES
+# Instalar con: pip install -r requirements.txt
+
+sqlalchemy>=2.0
+fastapi>=0.100
+uvicorn>=0.20
+python-multipart>=0.0.5
+httpx>=0.24

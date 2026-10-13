@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl" type="text/xsl"?>
+<nmaprun scanner="nmap" args="nmap -sV -sC -O -oX scan_output.xml 192.168.56.0/24" start="1718300000" startstr="Thu Jun 13 18:13:20 2024" version="7.94SVN" xmloutputversion="1.05">
+  <scaninfo type="syn" protocol="tcp" numservices="1000" services="1-1000"/>
+
+  <!-- Host 1: Servidor Web (Linux + Apache + WordPress) -->
+  <host starttime="1718300001" endtime="1718300120">
+    <status state="up" reason="echo-reply" reason_ttl="64"/>
+    <address addr="192.168.56.101" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="webserver.lab.local" type="PTR"/>
+      <hostname name="www.lab.local" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="ssh" product="OpenSSH" version="8.9p1" extrainfo="Ubuntu Linux; protocol 2.0" method="probed" conf="10">
+          <cpe>cpe:/a:openbsd:openssh:8.9p1</cpe>
+        </service>
+        <script id="ssh-hostkey" output="&#xa;  256 SHA256:abc123def456 (ECDSA)&#xa;  256 SHA256:xyz789ghi012 (ED25519)"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="http" product="Apache httpd" version="2.4.52" extrainfo="(Ubuntu)" method="probed" conf="10">
+          <cpe>cpe:/a:apache:http_server:2.4.52</cpe>
+        </service>
+        <script id="http-title" output="Lab WordPress Site"/>
+        <script id="http-server-header" output="Apache/2.4.52 (Ubuntu)"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="https" product="Apache httpd" version="2.4.52" tunnel="ssl" extrainfo="(Ubuntu)" method="probed" conf="10">
+          <cpe>cpe:/a:apache:http_server:2.4.52</cpe>
+        </service>
+        <script id="ssl-cert" output="Subject: commonName=webserver.lab.local&#xa;Issuer: commonName=Lab CA"/>
+      </port>
+      <port protocol="tcp" portid="3306">
+        <state state="filtered" reason="no-response" reason_ttl="0"/>
+        <service name="mysql" method="table" conf="3"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Linux 5.4 - 5.15" accuracy="95" line="1">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="5.X" accuracy="95">
+          <cpe>cpe:/o:linux:linux_kernel:5</cpe>
+        </osclass>
+      </osmatch>
+      <osmatch name="Linux 4.15 - 5.6" accuracy="90" line="2">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="4.X" accuracy="90">
+          <cpe>cpe:/o:linux:linux_kernel:4</cpe>
+        </osclass>
+      </osmatch>
+    </os>
+  </host>
+
+  <!-- Host 2: Servidor de Base de Datos (Linux + PostgreSQL) -->
+  <host starttime="1718300002" endtime="1718300115">
+    <status state="up" reason="echo-reply" reason_ttl="64"/>
+    <address addr="192.168.56.102" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="dbserver.lab.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="ssh" product="OpenSSH" version="9.0p1" extrainfo="Debian" method="probed" conf="10">
+          <cpe>cpe:/a:openbsd:openssh:9.0p1</cpe>
+        </service>
+      </port>
+      <port protocol="tcp" portid="5432">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="postgresql" product="PostgreSQL" version="15.2" method="probed" conf="10">
+          <cpe>cpe:/a:postgresql:postgresql:15.2</cpe>
+        </service>
+        <script id="pgsql-brute" output="No valid credentials found"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Linux 5.15" accuracy="98" line="1">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="5.X" accuracy="98">
+          <cpe>cpe:/o:linux:linux_kernel:5.15</cpe>
+        </osclass>
+      </osmatch>
+    </os>
+  </host>
+
+  <!-- Host 3: Máquina Windows (IIS + RDP) -->
+  <host starttime="1718300003" endtime="1718300130">
+    <status state="up" reason="echo-reply" reason_ttl="128"/>
+    <address addr="192.168.56.103" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="winserver.lab.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="http" product="Microsoft IIS httpd" version="10.0" method="probed" conf="10">
+          <cpe>cpe:/a:microsoft:iis:10.0</cpe>
+        </service>
+        <script id="http-title" output="IIS Windows Server"/>
+        <script id="http-methods" output="OPTIONS GET HEAD POST TRACE"/>
+      </port>
+      <port protocol="tcp" portid="135">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="msrpc" product="Microsoft Windows RPC" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="3389">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="ms-wbt-server" product="Microsoft Terminal Services" method="probed" conf="10">
+          <cpe>cpe:/o:microsoft:windows</cpe>
+        </service>
+        <script id="rdp-ntlm-info" output="Target_Name: WINSERVER&#xa;NetBIOS_Domain_Name: LAB&#xa;DNS_Computer_Name: winserver.lab.local"/>
+      </port>
+      <port protocol="tcp" portid="445">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="microsoft-ds" product="Microsoft Windows SMB" method="probed" conf="10"/>
+        <script id="smb2-security-mode" output="Message signing enabled but not required"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Microsoft Windows Server 2019" accuracy="92" line="1">
+        <osclass type="general purpose" vendor="Microsoft" osfamily="Windows" osgen="2019" accuracy="92">
+          <cpe>cpe:/o:microsoft:windows_server_2019</cpe>
+        </osclass>
+      </osmatch>
+    </os>
+  </host>
+
+  <!-- Host 4: Máquina apagada -->
+  <host starttime="1718300004" endtime="1718300010">
+    <status state="down" reason="no-response" reason_ttl="0"/>
+    <address addr="192.168.56.200" addrtype="ipv4"/>
+    <hostnames/>
+    <ports/>
+  </host>
+
+  <runstats>
+    <finished time="1718300200" timestr="Thu Jun 13 18:16:40 2024" elapsed="200.00" summary="Nmap done at Thu Jun 13 18:16:40 2024; 4 hosts scanned (3 hosts up) in 200.00 seconds" exit="success"/>
+    <hosts up="3" down="1" total="4"/>
+  </runstats>
+</nmaprun>

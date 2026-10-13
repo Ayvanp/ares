@@ -1,0 +1,12 @@
+{"status":200,"url":"http://192.168.56.101/","path":"/","size":52846}
+{"status":301,"url":"http://192.168.56.101/wp-admin","path":"/wp-admin","size":0,"redirectlocation":"http://192.168.56.101/wp-admin/"}
+{"status":200,"url":"http://192.168.56.101/wp-admin/","path":"/wp-admin/","size":3578}
+{"status":200,"url":"http://192.168.56.101/wp-login.php","path":"/wp-login.php","size":6731}
+{"status":200,"url":"http://192.168.56.101/wp-content","path":"/wp-content","size":0}
+{"status":200,"url":"http://192.168.56.101/wp-includes","path":"/wp-includes","size":0}
+{"status":301,"url":"http://192.168.56.101/phpmyadmin","path":"/phpmyadmin","size":0,"redirectlocation":"http://192.168.56.101/phpmyadmin/"}
+{"status":200,"url":"http://192.168.56.101/phpmyadmin/","path":"/phpmyadmin/","size":11501}
+{"status":403,"url":"http://192.168.56.101/.htaccess","path":"/.htaccess","size":277}
+{"status":200,"url":"http://192.168.56.101/readme.html","path":"/readme.html","size":7401}
+{"status":200,"url":"http://192.168.56.101/xmlrpc.php","path":"/xmlrpc.php","size":42}
+{"status":200,"url":"http://192.168.56.101/license.txt","path":"/license.txt","size":19935}

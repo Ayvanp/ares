@@ -1,0 +1,38 @@
+# Excluir de la imagen Docker
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Base de datos local (se usa el volumen Docker)
+*.db
+*.sqlite
+
+# Evidencias y reportes locales
+evidencias/
+reportes/salida/
+
+# Tests (no necesarios en producción)
+tests/
+
+# Git
+.git/
+.gitignore
+
+# Documentación
+*.md
+README*
+
+# Variables de entorno locales
+.env
+.env.*
+
+# Archivos temporales
+*.tmp
+*.log

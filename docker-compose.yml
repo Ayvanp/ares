@@ -1,0 +1,62 @@
+version: "3.9"
+
+# ──────────────────────────────────────────────────────────────────
+# ARES — Docker Compose
+#
+# Inicio:         docker-compose up -d
+# Logs:           docker-compose logs -f
+# Detener:        docker-compose down
+# Reconstruir:    docker-compose up -d --build
+#
+# La API queda en: http://localhost:8000
+# Documentación:  http://localhost:8000/docs
+# ──────────────────────────────────────────────────────────────────
+
+services:
+  ares:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ares-server
+    restart: unless-stopped
+
+    # ── Red ──────────────────────────────────────────────────────
+    # host: el contenedor comparte la red del host.
+    # Necesario para que Nmap llegue a través de la VPN de HTB.
+    # Solo funciona en Linux nativo.
+    network_mode: host
+
+    # ── Si usas macOS o Windows, comenta network_mode y usa ports:
+    # ports:
+    #   - "8000:8000"
+
+    # ── Volúmenes (datos persistentes) ───────────────────────────
+    volumes:
+      # Base de datos SQLite
+      - ares-data:/app/data
+      # Outputs crudos de cada herramienta (evidencias)
+      - ares-evidencias:/app/evidencias
+      # Reportes HTML y CSV generados
+      - ares-reportes:/app/reportes/salida
+
+    # ── Variables de entorno ─────────────────────────────────────
+    environment:
+      - ARES_DATABASE_URL=sqlite:////app/data/ares.db
+      - PYTHONUNBUFFERED=1
+
+    # ── Verificación de salud ────────────────────────────────────
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+# ── Volúmenes ─────────────────────────────────────────────────────
+volumes:
+  ares-data:
+    driver: local
+  ares-evidencias:
+    driver: local
+  ares-reportes:
+    driver: local
