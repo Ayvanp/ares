@@ -1,0 +1,22 @@
+services:
+  ares:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ares-server
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./evidencias:/app/evidencias
+      - ./reportes/salida:/app/reportes/salida
+    environment:
+      ARES_DATABASE_URL: sqlite:////app/data/ares.db
+      PYTHONUNBUFFERED: "1"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

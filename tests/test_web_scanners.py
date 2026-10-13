@@ -14,6 +14,7 @@ from parsers.gobuster import parsear_gobuster
 from modelos import Host, Servicio
 from orquestador import (
     evaluar_primera_ronda, evaluar_tercera_ronda,
+    es_redireccion_uniforme_gobuster, omitir_dirb_sobre_ip,
     _encontrar_wordlist, PERFILES,
 )
 
@@ -210,6 +211,18 @@ class TestTerceraRonda(unittest.TestCase):
         self.assertIn("gobuster", herramientas)
         # dirb no está en la primera ronda (queda para el respaldo)
         self.assertNotIn("dirb", herramientas)
+
+    def test_identifica_redireccion_uniforme(self):
+        error = ("the server returns a status code that matches the provided "
+                 "options for non existing urls. http://10.0.0.1/abc => 302 (Length: 154)")
+        self.assertTrue(es_redireccion_uniforme_gobuster(error))
+        self.assertFalse(es_redireccion_uniforme_gobuster("connection timed out"))
+
+    def test_omite_respaldo_ip_si_hay_vhost(self):
+        url = "http://10.0.0.1"
+        self.assertTrue(omitir_dirb_sobre_ip(url, {url}, {"snapped.htb"}))
+        self.assertFalse(omitir_dirb_sobre_ip(url, set(), {"snapped.htb"}))
+        self.assertFalse(omitir_dirb_sobre_ip(url, {url}, set()))
 
 
 class TestWordlists(unittest.TestCase):

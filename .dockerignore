@@ -18,9 +18,6 @@ build/
 evidencias/
 reportes/salida/
 
-# Tests (no necesarios en producción)
-tests/
-
 # Git
 .git/
 .gitignore

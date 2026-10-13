@@ -10,7 +10,8 @@ automáticamente y genera reportes HTML y CSV.
 
 - Docker
 - Docker Compose
-- Python 3.10+ (solo para el CLI en tu máquina)
+- Python 3.10+ (opcional, si ejecutas el CLI fuera de Docker)
+- En Windows: Docker Desktop con contenedores Linux
 
 ---
 
@@ -19,34 +20,38 @@ automáticamente y genera reportes HTML y CSV.
 ### 1. Levantar el servidor
 
 ```bash
-docker-compose up -d
+# Kali/Linux
+docker compose up -d
+
+# Windows con Docker Desktop
+docker compose -f docker-compose.windows.yml up --build -d
 ```
 
 Esto construye la imagen con todas las herramientas instaladas
-(Nmap, WhatWeb, Gobuster, dirb y Nuclei) y levanta la API en el puerto 8000.
+(Nmap, WhatWeb, Gobuster, Dirb y Nuclei) y levanta la API en el puerto 8000.
 
 La primera vez tarda unos minutos mientras descarga e instala todo.
 Las veces siguientes arranca en segundos.
 
-### 2. Instalar el CLI en tu máquina
+### 2. Usar el CLI
 
 ```bash
-pip install -r requirements.txt
+# Linux/Kali, con el servidor ya iniciado
+python ares.py herramientas
 ```
 
-O con virtual environment:
-
-```bash
-python -m venv venv
-source venv/bin/activate    # Linux/macOS
-venv\Scripts\activate       # Windows
-pip install -r requirements.txt
-```
+En Windows, ejecuta el CLI dentro del contenedor como se muestra en la sección
+[Windows (Docker Desktop)](#windows-docker-desktop); no hace falta instalar
+Python ni las herramientas de escaneo en Windows.
 
 ### 3. Verificar que todo funciona
 
 ```bash
+# Kali/Linux
 python ares.py herramientas
+
+# Windows con Docker Desktop
+docker compose -f docker-compose.windows.yml exec ares python ares.py herramientas
 ```
 
 Deberías ver todas las herramientas como "instalada".
@@ -133,6 +138,9 @@ ares/
     generador.py      HTML y CSV
   Dockerfile
   docker-compose.yml
+  docker-compose.windows.yml
+  tests/              Pruebas automatizadas
+  samples/            Salidas de ejemplo para las pruebas
 ```
 
 ---
@@ -140,20 +148,27 @@ ares/
 ## Gestión del servidor Docker
 
 ```bash
-# Ver logs en tiempo real
-docker-compose logs -f
+# Kali/Linux: ver logs en tiempo real
+docker compose logs -f
 
-# Detener el servidor
-docker-compose down
+# Kali/Linux: detener el servidor
+docker compose down
 
-# Reiniciar
-docker-compose restart
+# Kali/Linux: reiniciar
+docker compose restart
 
-# Reconstruir la imagen (tras cambios en el código)
-docker-compose up -d --build
+# Kali/Linux: reconstruir la imagen (tras cambios en el código)
+docker compose up -d --build
 
-# Ver estado
-docker-compose ps
+# Kali/Linux: ver estado
+docker compose ps
+```
+
+En Windows, añade `-f docker-compose.windows.yml` a esos comandos; por ejemplo:
+
+```powershell
+docker compose -f docker-compose.windows.yml logs -f
+docker compose -f docker-compose.windows.yml up --build -d
 ```
 
 ---
@@ -182,17 +197,44 @@ curl -X POST http://localhost:8000/escaneos/<ID>/reporte/html -o reporte.html
 
 ---
 
-## macOS y Windows
+## Windows (Docker Desktop)
 
-En macOS y Windows, Docker Desktop usa una VM interna y
-`network_mode: host` no funciona. Para usar con HTB:
+ARES y sus escáneres corren dentro de un contenedor Linux. En Windows se
+necesita Docker Desktop con el motor de contenedores Linux iniciado. Desde
+PowerShell, en la carpeta `ares_final`, ejecuta:
 
-1. Comenta `network_mode: host` en `docker-compose.yml`
-2. Descomenta la sección `ports`
-3. Las herramientas escanearán desde la VM de Docker, no desde el host
+```powershell
+docker compose -f docker-compose.windows.yml up --build -d
+```
 
-Para HTB con VPN en macOS/Windows se recomienda correr
-las herramientas directamente en el host o usar una VM Linux.
+La API queda en <http://localhost:8000> y su documentación interactiva en
+<http://localhost:8000/docs>. La configuración de Windows guarda la base de
+datos en `data/`, las evidencias en `evidencias/` y los reportes en
+`reportes/salida/`, dentro de esta carpeta del proyecto.
+
+Para comprobar las herramientas y ejecutar la suite incluida:
+
+```powershell
+docker compose -f docker-compose.windows.yml exec ares python ares.py herramientas
+docker compose -f docker-compose.windows.yml exec ares python -m unittest discover -s tests -v
+```
+
+También puedes iniciar escaneos desde el contenedor:
+
+```powershell
+docker compose -f docker-compose.windows.yml exec ares python ares.py iniciar OBJETIVO --perfil rapido
+```
+
+Reemplaza `OBJETIVO` por la IP o el hostname de un equipo al que tengas
+autorización para escanear y que sea accesible desde el contenedor.
+
+Desde el contenedor, `127.0.0.1` identifica al propio contenedor ARES. Para
+escanear un servicio que se ejecuta en Windows, usa `host.docker.internal` como
+objetivo y asegúrate de que el servicio acepte conexiones desde Docker. Para
+escanear otro contenedor en la misma red Compose, usa el nombre de ese servicio.
+La ruta de una VPN de HTB en Windows puede no estar disponible dentro de Docker
+Desktop; para ese caso conviene usar una VM Linux/Kali o WSL con la VPN y la ruta
+de red configuradas.
 
 ---
 
@@ -200,9 +242,11 @@ las herramientas directamente en el host o usar una VM Linux.
 
 ```bash
 # Desde el directorio del proyecto (sin Docker)
-pip install -r requirements.txt pytest
-python -m pytest -q          # 159 pruebas
+python -m unittest discover tests -v   # 162 pruebas
 ```
+
+En Windows, ejecuta la misma suite dentro del contenedor con el comando de la
+sección [Windows (Docker Desktop)](#windows-docker-desktop).
 
 ---
 

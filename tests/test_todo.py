@@ -568,6 +568,15 @@ class TestVhosts(unittest.TestCase):
         r = ResultadoCanonico(metadatos=meta, hosts=[host])
         self.assertIn("fireflow.htb", descubrir_hostnames(r))
 
+    def test_descubrir_desde_hostname_nmap_sin_redirect(self):
+        from datetime import datetime, timezone
+        from modelos import ResultadoCanonico, MetadatosEscaneo, Host
+        from vhosts import descubrir_hostnames
+        host = Host(ip="10.129.1.2", hostnames=["snapped.htb", "localhost"])
+        meta = MetadatosEscaneo("nmap", "nmap", datetime.now(tz=timezone.utc))
+        r = ResultadoCanonico(metadatos=meta, hosts=[host])
+        self.assertEqual(descubrir_hostnames(r), {"snapped.htb"})
+
     def test_agregar_y_limpiar_hosts(self):
         import tempfile, os
         from vhosts import agregar_a_etc_hosts, limpiar_etc_hosts

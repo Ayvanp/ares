@@ -15,6 +15,7 @@ WORKDIR /app
 # ── 1. Sistema base ──────────────────────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nmap \
+    whatweb \
     ruby \
     ruby-dev \
     curl \
@@ -25,8 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dirb \
     && rm -rf /var/lib/apt/lists/*
 
-# ── 2. WhatWeb ───────────────────────────────────────────────────
-RUN gem install whatweb --no-document 2>&1 | tail -3
+# WhatWeb se instala desde Debian junto con sus dependencias Ruby.
+# No existe una gema oficial instalable llamada whatweb.
 
 # ── 3. Gobuster ──────────────────────────────────────────────────
 RUN GOBUSTER_VERSION="3.6.0" && \
@@ -58,6 +59,8 @@ COPY api.py ares.py modelos.py correlacion.py orquestador.py vhosts.py ./
 COPY parsers/ ./parsers/
 COPY base_datos/ ./base_datos/
 COPY reportes/ ./reportes/
+COPY tests/ ./tests/
+COPY samples/ ./samples/
 
 RUN mkdir -p /app/data /app/evidencias /app/reportes/salida
 

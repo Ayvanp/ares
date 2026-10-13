@@ -43,6 +43,11 @@ def descubrir_hostnames(resultado_nmap):
                 nombres.add(m)
 
     for host in resultado_nmap.hosts:
+        # Nmap puede conservar el nombre como PTR/hostname en ejecuciones
+        # posteriores, cuando ARES ya lo agregó a /etc/hosts. En ese caso el
+        # servidor responde directamente y el script HTTP ya no ve el redirect.
+        for nombre in host.hostnames:
+            nombres.add(nombre)
         for sc in host.scripts_host:
             procesar(sc.salida)
         for s in host.servicios:

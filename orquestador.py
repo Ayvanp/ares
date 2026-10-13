@@ -192,6 +192,18 @@ def evaluar_tercera_ronda(host_gobuster, url, puerto, perfil_config):
     return tareas
 
 
+def es_redireccion_uniforme_gobuster(mensaje):
+    """Identifica el rechazo de Gobuster a un redirect para rutas inexistentes."""
+    mensaje = (mensaje or "").lower()
+    return ("non existing urls" in mensaje and
+            any("=> " + codigo in mensaje for codigo in ("301", "302", "303", "307", "308")))
+
+
+def omitir_dirb_sobre_ip(url, redirecciones_gobuster, hostnames_nmap):
+    """Evita repetir por IP una búsqueda que debe hacerse contra el vHost."""
+    return url in redirecciones_gobuster and bool(hostnames_nmap)
+
+
 # ── Función principal ──
 
 def orquestar(target, perfil_nombre, bd, escaneo_id, fn_progreso=None):
@@ -288,6 +300,7 @@ def orquestar(target, perfil_nombre, bd, escaneo_id, fn_progreso=None):
 
         # ── Etapa 3: Ejecutar primera ronda ──
         resultados_web = []
+        gobuster_redirecciones = set()
         for tarea in tareas_pendientes:
             herramienta = tarea["herramienta"]
             ip = tarea["ip"]
@@ -303,6 +316,8 @@ def orquestar(target, perfil_nombre, bd, escaneo_id, fn_progreso=None):
                 # Aunque falle o se corte por timeout, la herramienta puede
                 # haber dejado resultados parciales en el archivo. Los rescatamos.
                 if not _hay_salida_parcial(archivo_salida):
+                    if herramienta == "gobuster" and es_redireccion_uniforme_gobuster(mensaje):
+                        gobuster_redirecciones.add(tarea["comando_template"][3])
                     log("[" + herramienta + "] Omitido: " + mensaje)
                     actualizar_estado("running", herramienta + "_" + sufijo, "skipped"); continue
                 log("[" + herramienta + "] Parcial (" + mensaje + "), rescatando resultados")
@@ -315,8 +330,9 @@ def orquestar(target, perfil_nombre, bd, escaneo_id, fn_progreso=None):
                 todos_resultados.append(resultado)
                 resultados_web.append(resultado)
 
-        # ── Etapa 4: Segunda ronda (WhatWeb) + Tercera ronda (dirb→Gobuster) ──
+        # ── Etapa 4: Segunda ronda (WhatWeb) + respaldo (Gobuster→dirb) ──
         tareas_segunda = []
+        hostnames_nmap = descubrir_hostnames(resultado_nmap)
 
         # Segunda ronda: tecnologías detectadas por WhatWeb → Nuclei
         for resultado in resultados_web:
@@ -343,6 +359,14 @@ def orquestar(target, perfil_nombre, bd, escaneo_id, fn_progreso=None):
                 partes = _up(url)
                 puerto = partes.port or (443 if partes.scheme == "https" else 80)
 
+                # Un servidor que redirige incluso las rutas inexistentes hacia
+                # un vHost hace fallar Gobuster. Dirb sobre esa misma IP no
+                # aporta información: se prioriza el barrido contra el nombre.
+                if omitir_dirb_sobre_ip(url, gobuster_redirecciones, hostnames_nmap):
+                    log("[dirb] Omitido sobre IP con redirección uniforme; "
+                        "se analizará el vHost descubierto")
+                    continue
+
                 # ¿Cuántas rutas encontró Gobuster para esta URL?
                 host_gb = None
                 for res in resultados_web:
@@ -364,7 +388,7 @@ def orquestar(target, perfil_nombre, bd, escaneo_id, fn_progreso=None):
         # aparece en el certificado TLS o en un redirect. Lo descubrimos,
         # lo registramos en /etc/hosts y re-escaneamos contra ese nombre.
         if perfil_config["activar_web"]:
-            hostnames = descubrir_hostnames(resultado_nmap)
+            hostnames = hostnames_nmap
             if hostnames:
                 log("vHosts descubiertos: " + ", ".join(sorted(hostnames)))
                 # Registrarlos como hostname del activo (para el reporte)

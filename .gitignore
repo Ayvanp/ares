@@ -9,6 +9,7 @@ venv/
 *.db
 *.sqlite
 evidencias/
+data/
 reportes/salida/
 hallazgos_*.csv
 reporte_*.html
