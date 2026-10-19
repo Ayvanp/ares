@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe de evaluación — 10.129.102.173</title>
+  <style>
+    :root {
+      --paper:#ffffff; --ground:#f4f3ef; --ink:#1c1e21; --muted:#585c61;
+      --faint:#8a8e93; --line:#e4e2dc; --line-strong:#cbc8c0;
+      --accent:#294f5c; --accent-soft:#e8eff0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--ground); color: var(--ink);
+      font-size: 15px; line-height: 1.62; -webkit-font-smoothing: antialiased;
+    }
+    .page { max-width: 840px; margin: 0 auto; padding: 40px 30px 80px; }
+    .sheet { background: var(--paper); border: 1px solid var(--line);
+              padding: 48px 52px 40px; }
+
+    h1, h2, h3 { font-family: Georgia, "Iowan Old Style", "Palatino Linotype",
+                  "Times New Roman", serif; font-weight: 600; line-height: 1.2; }
+    code, .mono { font-family: "SFMono-Regular", ui-monospace, "Cascadia Mono",
+                   Consolas, "Liberation Mono", monospace; }
+    a { color: var(--accent); }
+
+    /* Encabezado */
+    .doc-head { border-bottom: 2px solid var(--ink); padding-bottom: 22px; margin-bottom: 4px; }
+    .doc-kicker { font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+                   color: var(--accent); font-weight: 600; margin-bottom: 10px; }
+    .doc-head h1 { font-size: 30px; letter-spacing: -.01em; }
+    .doc-head .target { font-family: "SFMono-Regular", ui-monospace, Consolas, monospace;
+                         font-size: 16px; color: var(--muted); margin-top: 6px; }
+
+    /* Ficha de metadatos */
+    .meta-grid { display: grid; grid-template-columns: repeat(2, 1fr);
+                  border: 1px solid var(--line); margin: 26px 0 6px; }
+    .meta-grid .cell { padding: 11px 16px; border-bottom: 1px solid var(--line); }
+    .meta-grid .cell:nth-child(odd) { border-right: 1px solid var(--line); }
+    .meta-grid .cell:nth-last-child(-n+2) { border-bottom: none; }
+    .meta-grid .k { font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+                     color: var(--faint); margin-bottom: 2px; }
+    .meta-grid .v { font-size: 14px; font-family: "SFMono-Regular", ui-monospace, Consolas, monospace; }
+    .riesgo-linea { display: flex; align-items: center; gap: 10px; margin-top: 20px;
+                     font-size: 14px; }
+    .riesgo-sq { width: 13px; height: 13px; display: inline-block; }
+    .riesgo-linea strong { font-weight: 600; }
+
+    /* Secciones numeradas */
+    section { margin-top: 44px; }
+    section > h2 { font-size: 20px; padding-bottom: 8px; border-bottom: 1px solid var(--line-strong);
+                    margin-bottom: 18px; display: flex; align-items: baseline; gap: 12px; }
+    section > h2 .n { font-family: "SFMono-Regular", ui-monospace, Consolas, monospace;
+                       font-size: 14px; color: var(--accent); font-weight: 700; }
+    h3 { font-size: 15.5px; margin: 22px 0 9px; color: var(--ink); }
+
+    /* Tira de conteos */
+    .conteos { display: flex; flex-wrap: wrap; border: 1px solid var(--line); }
+    .conteos .c { flex: 1; min-width: 110px; padding: 16px 18px;
+                   border-right: 1px solid var(--line); }
+    .conteos .c:last-child { border-right: none; }
+    .conteos .num { font-family: Georgia, serif; font-size: 27px; font-weight: 600;
+                     font-variant-numeric: tabular-nums; }
+    .conteos .lab { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* Etiquetas de severidad */
+    .sev-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .sev-tag { display: inline-flex; align-items: center; gap: 7px; font-size: 13px;
+                padding: 5px 12px 5px 10px; border: 1px solid var(--line-strong);
+                background: var(--paper); }
+    .sev-tag .dot { width: 9px; height: 9px; display: inline-block; }
+    .sev-tag b { font-weight: 600; }
+    .sev-inline { font-size: 11.5px; font-weight: 600; letter-spacing: .04em;
+                   text-transform: uppercase; padding: 1px 7px; border: 1px solid currentColor; }
+
+    /* Tablas */
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 4px; }
+    th { text-align: left; padding: 9px 12px; font-size: 11.5px; letter-spacing: .05em;
+          text-transform: uppercase; color: var(--muted); font-weight: 600;
+          border-bottom: 1.5px solid var(--line-strong); }
+    td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tbody tr:last-child td { border-bottom: none; }
+    td.mono, th.mono { font-family: "SFMono-Regular", ui-monospace, Consolas, monospace; font-size: 12.5px; }
+    .tnum { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .estado-ok { color: #4a6d2f; } .estado-skip { color: var(--faint); }
+    .estado-fail { color: #9d2933; }
+    .motivo { font-size: 12.5px; color: var(--muted); }
+
+    /* Lista de comandos */
+    .cmd-list { margin-top: 14px; border: 1px solid var(--line); }
+    .cmd-list .cmd { padding: 10px 14px; border-bottom: 1px solid var(--line);
+                      display: flex; gap: 14px; align-items: baseline; }
+    .cmd-list .cmd:last-child { border-bottom: none; }
+    .cmd-list .who { font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+                      color: var(--accent); font-weight: 600; min-width: 74px; }
+    .cmd-list code { font-size: 12.5px; color: var(--ink); word-break: break-all; }
+
+    /* Host */
+    .host { border: 1px solid var(--line-strong); margin-bottom: 22px; }
+    .host-head { padding: 14px 18px; border-bottom: 1px solid var(--line);
+                  background: var(--accent-soft); }
+    .host-head .ip { font-family: "SFMono-Regular", ui-monospace, Consolas, monospace;
+                      font-size: 17px; font-weight: 600; }
+    .host-head .os { font-size: 13px; color: var(--muted); margin-top: 1px; }
+    .host-body { padding: 8px 18px 18px; }
+
+    /* Hallazgo */
+    .hallazgo { border: 1px solid var(--line); border-left: 3px solid var(--faint);
+                 padding: 12px 15px; margin-bottom: 10px; }
+    .hallazgo .htit { font-weight: 600; font-size: 14px; }
+    .hallazgo .hmeta { font-size: 12px; color: var(--muted); margin-top: 3px;
+                        font-family: "SFMono-Regular", ui-monospace, Consolas, monospace; }
+    .hallazgo .hdesc { font-size: 13px; color: var(--muted); margin-top: 6px; }
+    .hallazgo .hloc { font-size: 12px; color: var(--faint); margin-top: 5px;
+                       font-family: "SFMono-Regular", ui-monospace, Consolas, monospace; }
+    .evidencia { background: #f7f6f3; border: 1px solid var(--line); padding: 9px 11px;
+                  font-family: "SFMono-Regular", ui-monospace, Consolas, monospace; font-size: 11.5px;
+                  margin-top: 8px; white-space: pre-wrap; word-break: break-all;
+                  max-height: 160px; overflow-y: auto; }
+    .hrem { font-size: 12.5px; color: #3a5f4a; border-left: 3px solid #4a6d2f;
+             padding: 5px 10px; margin-top: 7px; background: #f3f7f2; }
+
+    /* Tecnologías / tags */
+    .tag { display: inline-block; border: 1px solid var(--line-strong); color: var(--muted);
+            padding: 2px 9px; font-size: 12px; margin: 2px 3px 2px 0; }
+    .tag em { color: var(--faint); font-style: normal; }
+    .cod { font-family: "SFMono-Regular", ui-monospace, Consolas, monospace; font-weight: 600; }
+    .cod-2 { color: #4a6d2f; } .cod-3 { color: #8a6d12; } .cod-4, .cod-5 { color: #9d2933; }
+
+    /* Correlación */
+    .corr { border: 1px solid var(--line); border-left: 3px solid var(--accent);
+             padding: 10px 14px; margin-bottom: 8px; }
+    .corr .ct { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+    .corr .conf { font-size: 11px; font-weight: 600; letter-spacing: .04em;
+                   text-transform: uppercase; padding: 1px 8px; border: 1px solid var(--line-strong);
+                   color: var(--muted); }
+    .corr .razon { font-size: 12px; color: var(--muted); margin: 5px 0; }
+    .vinc { font-size: 12.5px; color: var(--muted); }
+    .vinc::before { content: "→"; color: var(--accent); font-weight: 700; margin-right: 6px; }
+
+    .empty { font-size: 13px; color: var(--faint); font-style: italic; padding: 4px 0; }
+
+    .foot { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line);
+             font-size: 12px; color: var(--faint); display: flex; justify-content: space-between;
+             flex-wrap: wrap; gap: 8px; }
+
+    @media print {
+      body { background: white; }
+      .page { padding: 0; }
+      .sheet { border: none; padding: 0; }
+      .evidencia { max-height: none; }
+      section { page-break-inside: avoid; }
+    }
+    @media (max-width: 620px) {
+      .sheet { padding: 28px 20px; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .meta-grid .cell:nth-child(odd) { border-right: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="sheet">
+
+    
+    <div class="doc-head">
+      <div class="doc-kicker">Informe de evaluación de seguridad</div>
+      <h1>Resultados del reconocimiento</h1>
+      <div class="target">10.129.102.173</div>
+    </div>
+    <div class="meta-grid">
+      <div class="cell"><div class="k">Objetivo</div><div class="v">10.129.102.173</div></div>
+      <div class="cell"><div class="k">Perfil</div><div class="v">completo</div></div>
+      <div class="cell"><div class="k">Inicio</div><div class="v">2026-08-26 16:58:28</div></div>
+      <div class="cell"><div class="k">Fin</div><div class="v">2026-08-26 17:10:22</div></div>
+      <div class="cell"><div class="k">Duración</div><div class="v">11m 53s</div></div>
+      <div class="cell"><div class="k">Estado</div><div class="v">completed</div></div>
+    </div>
+    <div class="riesgo-linea">
+      <span class="riesgo-sq" style="background:#4a6d2f"></span>
+      Nivel de riesgo agregado: <strong>Bajo</strong>
+    </div>
+    <div style="font-size:11px;color:var(--faint);margin-top:14px;font-family:monospace">ID aa5e6d82-aad2-49fa-b78a-114fc6836b9d</div>
+    
+    <section>
+      <h2><span class="n">01</span> Resumen ejecutivo</h2>
+      <div class="conteos"><div class="c"><div class="num">1</div><div class="lab">Hosts</div></div><div class="c"><div class="num">3</div><div class="lab">Servicios</div></div><div class="c"><div class="num">6</div><div class="lab">Tecnologías</div></div><div class="c"><div class="num">5</div><div class="lab">Endpoints</div></div><div class="c"><div class="num">10</div><div class="lab">Hallazgos</div></div></div>
+      <h3>Hallazgos por severidad</h3><div class="sev-row"><span class="sev-tag"><span class="dot" style="background:#8a6d12"></span><b>Media</b> · 1</span><span class="sev-tag"><span class="dot" style="background:#5b6570"></span><b>Informativa</b> · 9</span></div>
+    </section>
+    
+    <section>
+      <h2><span class="n">02</span> Cronología de ejecución</h2>
+      
+      <table>
+        <thead><tr><th>Paso</th><th>Inicio</th><th>Fin</th><th>Duración</th><th>Estado</th><th>Motivo</th></tr></thead>
+        <tbody><tr>
+          <td class="mono">nmap</td>
+          <td class="tnum">16:58:28</td>
+          <td class="tnum">16:58:49</td>
+          <td class="tnum">21 s</td>
+          <td class="estado-ok">completed</td>
+          <td class="motivo">Escaneo base de puertos, versiones y sistema operativo</td>
+        </tr><tr>
+          <td class="mono">nuclei_ftp_21</td>
+          <td class="tnum">16:58:49</td>
+          <td class="tnum">16:59:02</td>
+          <td class="tnum">13 s</td>
+          <td class="estado-ok">completed</td>
+          <td class="motivo">Nmap identificó ftp en :21</td>
+        </tr><tr>
+          <td class="mono">nuclei_ssh_22</td>
+          <td class="tnum">16:59:02</td>
+          <td class="tnum">16:59:18</td>
+          <td class="tnum">15 s</td>
+          <td class="estado-ok">completed</td>
+          <td class="motivo">Nmap identificó ssh en :22</td>
+        </tr><tr>
+          <td class="mono">nuclei_openssh_22</td>
+          <td class="tnum">16:59:18</td>
+          <td class="tnum">16:59:20</td>
+          <td class="tnum">1 s</td>
+          <td class="estado-ok">completed</td>
+          <td class="motivo">Nmap detectó OpenSSH en :22</td>
+        </tr><tr>
+          <td class="mono">whatweb_ww_80</td>
+          <td class="tnum">16:59:20</td>
+          <td class="tnum">16:59:23</td>
+          <td class="tnum">3 s</td>
+          <td class="estado-ok">completed</td>
+          <td class="motivo">HTTP en :80</td>
+        </tr><tr>
+          <td class="mono">dirb_db_80</td>
+          <td class="tnum">16:59:23</td>
+          <td class="tnum">17:04:23</td>
+          <td class="tnum">300 s</td>
+          <td class="estado-ok">completed</td>
+          <td class="motivo">HTTP en :80</td>
+        </tr><tr>
+          <td class="mono">nuclei_http_80</td>
+          <td class="tnum">17:04:23</td>
+          <td class="tnum">17:05:21</td>
+          <td class="tnum">58 s</td>
+          <td class="estado-ok">completed</td>
+          <td class="motivo">HTTP en :80</td>
+        </tr><tr>
+          <td class="mono">gobuster_gb_deep_80</td>
+          <td class="tnum">17:05:21</td>
+          <td class="tnum">17:10:22</td>
+          <td class="tnum">300 s</td>
+          <td class="estado-ok">completed</td>
+          <td class="motivo">dirb encontró solo 1 resultado(s) en :80 → Gobuster más profundo</td>
+        </tr></tbody>
+      </table>
+      <h3>Comandos ejecutados</h3><div class="cmd-list"><div class="cmd"><span class="who">nmap</span><code>nmap -sV -sC -O -T4 -oX /tmp/ares_500ch1is/nmap.xml 10.129.102.173</code></div><div class="cmd"><span class="who">nuclei</span><code>nuclei -target 10.129.102.173:21 -tags ftp -jsonl -o /tmp/ares_500ch1is/nuclei_10-129-102-173_ftp_21.jsonl -silent</code></div><div class="cmd"><span class="who">nuclei</span><code>nuclei -target 10.129.102.173:22 -tags ssh -jsonl -o /tmp/ares_500ch1is/nuclei_10-129-102-173_ssh_22.jsonl -silent</code></div><div class="cmd"><span class="who">nuclei</span><code>nuclei -target 10.129.102.173:22 -tags openssh -jsonl -o /tmp/ares_500ch1is/nuclei_10-129-102-173_openssh_22.jsonl -silent</code></div><div class="cmd"><span class="who">whatweb</span><code>whatweb http://10.129.102.173 --log-json /tmp/ares_500ch1is/whatweb_10-129-102-173_ww_80.json --no-errors</code></div><div class="cmd"><span class="who">dirb</span><code>dirb http://10.129.102.173 /usr/share/dirb/wordlists/common.txt -o /tmp/ares_500ch1is/dirb_10-129-102-173_db_80.txt -S -r</code></div><div class="cmd"><span class="who">nuclei</span><code>nuclei -target http://10.129.102.173 -tags http,exposure,misconfig -jsonl -o /tmp/ares_500ch1is/nuclei_10-129-102-173_http_80.jsonl -silent</code></div><div class="cmd"><span class="who">gobuster</span><code>gobuster dir -u http://10.129.102.173 -w /usr/share/seclists/Discovery/Web-Content/big.txt --no-progress -o /tmp/ares_500ch1is/gobuster_10-129-102-173_gb_deep_80.jsonl -q -e -b 404,500,503 --timeout 15s</code></div></div>
+    </section>
+
+    <section>
+      <h2><span class="n">03</span> Detalle por host</h2>
+      
+    <div class="host">
+      <div class="host-head">
+        <div class="ip">10.129.102.173</div>
+        <div class="os">Linux 4.15 - 5.19 (100% precisión)</div>
+        
+      </div>
+      <div class="host-body">
+        
+        <h3>Servicios (3)</h3>
+        <table>
+          <thead><tr><th>Puerto</th><th>Estado</th><th>Servicio</th><th>Producto / Versión</th></tr></thead>
+          <tbody><tr>
+              <td class="mono">21/tcp</td>
+              <td class="estado-ok">open</td>
+              <td>ftp</td>
+              <td>vsftpd 3.0.3</td>
+            </tr><tr>
+              <td class="mono">22/tcp</td>
+              <td class="estado-ok">open</td>
+              <td>ssh</td>
+              <td>OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</td>
+            </tr><tr>
+              <td class="mono">80/tcp</td>
+              <td class="estado-ok">open</td>
+              <td>http</td>
+              <td>Gunicorn</td>
+            </tr></tbody>
+        </table>
+        <h3>Tecnologías (6)</h3><div><span class="tag">Bootstrap  <em>(CSS Framework)</em></span><span class="tag">HTTPServer  <em>(Web Server)</em></span><span class="tag">JQuery 2.2.4 <em>(Other)</em></span><span class="tag">Modernizr 2.8.3.min <em>(Other)</em></span><span class="tag">Script  <em>(Other)</em></span><span class="tag">X-UA-Compatible  <em>(Other)</em></span></div>
+        
+        <h3>Endpoints descubiertos (5)</h3>
+        <table>
+          <thead><tr><th>Código</th><th>Ruta</th></tr></thead>
+          <tbody><tr>
+              <td class="cod cod-2">200</td>
+              <td class="mono">/ip</td>
+            </tr><tr>
+              <td class="cod cod-2">200</td>
+              <td class="mono">/netstat</td>
+            </tr><tr>
+              <td class="cod cod-3">302</td>
+              <td class="mono">/data</td>
+            </tr><tr>
+              <td class="cod cod-3">302</td>
+              <td class="mono">/capture <span style="color:var(--faint)">→ http://10.129.102.173/data/1</span></td>
+            </tr><tr>
+              <td class="cod cod-3">302</td>
+              <td class="mono">/data <span style="color:var(--faint)">→ http://10.129.102.173/</span></td>
+            </tr></tbody>
+        </table>
+        <h3>Hallazgos (10)</h3>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">FTP Service - Detect</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; ftp-detect</div>
+              <div class="hdesc">FTP service was detected.
+</div>
+              <div class="hloc">10.129.102.173:21</div>
+              <div style="margin-top:6px"><span class="tag">network</span><span class="tag">ftp</span><span class="tag">detect</span><span class="tag">detection</span><span class="tag">tcp</span></div>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">vsFTPd Service - Detect</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; vsftpd-detect</div>
+              <div class="hdesc">vsFTPd FTP service was detected.</div>
+              <div class="hloc">10.129.102.173:21</div>
+              <div style="margin-top:6px"><span class="tag">network</span><span class="tag">ftp</span><span class="tag">vsftpd</span><span class="tag">detect</span><span class="tag">tcp</span></div>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">OpenSSH Service - Detect</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; <a href="https://nvd.nist.gov/vuln/detail/CVE-2016-6210" target="_blank">CVE-2016-6210</a> <a href="https://nvd.nist.gov/vuln/detail/CVE-2018-15473" target="_blank">CVE-2018-15473</a>  &nbsp; openssh-detect</div>
+              <div class="hdesc">OpenSSH service was detected.
+</div>
+              <div class="hloc">10.129.102.173:22</div>
+              <div style="margin-top:6px"><span class="tag">seclists</span><span class="tag">network</span><span class="tag">ssh</span><span class="tag">openssh</span><span class="tag">detect</span></div>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">SSH Password-based Authentication</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; ssh-password-auth</div>
+              
+              <div class="hloc">10.129.102.173:22</div>
+              <div style="margin-top:6px"><span class="tag">ssh</span><span class="tag">js</span><span class="tag">enum</span><span class="tag">network</span><span class="tag">discovery</span></div>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">SSH SHA-1 HMAC Algorithms Enabled</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; ssh-sha1-hmac-algo</div>
+              <div class="hdesc">The SSH server at the remote end is set up to allow the use of SHA-1 HMAC algorithms.
+</div>
+              <div class="hloc">10.129.102.173:22</div>
+              <div style="margin-top:6px"><span class="tag">enum</span><span class="tag">js</span><span class="tag">ssh</span><span class="tag">misconfig</span><span class="tag">network</span></div>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">SSH Server Software Enumeration</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; ssh-server-enumeration</div>
+              
+              <div class="hloc">10.129.102.173:22</div>
+              <div style="margin-top:6px"><span class="tag">js</span><span class="tag">ssh</span><span class="tag">enum</span><span class="tag">network</span><span class="tag">discovery</span></div>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">SSH Auth Methods - Detection</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; ssh-auth-methods</div>
+              <div class="hdesc">SSH (Secure Shell) authentication modes are methods used to verify the identity of users and ensure secure access to remote systems. Common SSH authentication modes include password-based authentication, which relies on a secret passphrase, and public key authentication, which uses cryptographic keys for a more secure and convenient login process. Additionally, multi-factor authentication (MFA) can be employed to enhance security by requiring users to provide multiple forms of authentication, such as a password and a one-time code.
+</div>
+              <div class="hloc">10.129.102.173:22</div>
+              <div style="margin-top:6px"><span class="tag">js</span><span class="tag">detect</span><span class="tag">ssh</span><span class="tag">enum</span><span class="tag">network</span></div>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">HTTP Missing Security Headers</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; http-missing-security-headers</div>
+              <div class="hdesc">This template searches for missing HTTP security headers. The impact of these missing headers can vary.
+</div>
+              <div class="hloc">http://10.129.102.173</div>
+              <div style="margin-top:6px"><span class="tag">misconfig</span><span class="tag">headers</span><span class="tag">generic</span><span class="tag">vuln</span></div>
+              <div class="evidencia">curl -X 'GET' -d '' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36' 'http://10.129.102.173'</div>
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#5b6570">
+              <div class="htit">Missing Subresource Integrity</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#5b6570">Informativa</span> &nbsp; missing-sri</div>
+              <div class="hdesc">Checks if external script and stylesheet tags in the HTML response are missing the Subresource Integrity (SRI) attribute.
+</div>
+              <div class="hloc">http://10.129.102.173/</div>
+              <div style="margin-top:6px"><span class="tag">compliance</span><span class="tag">js</span><span class="tag">css</span><span class="tag">sri</span><span class="tag">misconfig</span></div>
+              <div class="evidencia">curl -X 'GET' -d '' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (ZZ; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36' 'http://10.129.102.173/'</div>
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#8a6d12">
+              <div class="htit">OpenSSH Terrapin Attack - Detection</div>
+              <div class="hmeta"><span class="sev-inline" style="color:#8a6d12">Media</span> &nbsp; <a href="https://nvd.nist.gov/vuln/detail/cve-2023-48795" target="_blank">cve-2023-48795</a>  &nbsp; CVE-2023-48795</div>
+              <div class="hdesc">The SSH transport protocol with certain OpenSSH extensions, found in OpenSSH before 9.6 and other products, allows remote attackers to bypass integrity checks such that some packets are omitted (from the extension negotiation message), and a client and server may consequently end up with a connection for which some security features have been downgraded or disabled, aka a Terrapin attack. This occurs because the SSH Binary Packet Protocol (BPP), implemented by these extensions, mishandles the handshake phase and mishandles use of sequence numbers. For example, there is an effective attack against SSH's use of ChaCha20-Poly1305 (and CBC with Encrypt-then-MAC). The bypass occurs in chacha20-poly1305@openssh.com and (if CBC is used) the -etm@openssh.com MAC algorithms. This also affects Maverick Synergy Java SSH API before 3.1.0-SNAPSHOT, Dropbear through 2022.83, Ssh before 5.1.1 in Erlang/OTP, PuTTY before 0.80, AsyncSSH before 2.14.2, golang.org/x/crypto before 0.17.0, libssh before 0.10.6, libssh2 through 1.11.0, Thorn Tech SFTP Gateway before 3.4.6, Tera Term before 5.1, Paramiko before 3.4.0, jsch before 0.2.15, SFTPGo before 2.5.6, Netgate pfSense Plus through 23.09.1, Netgate pfSense CE through 2.7.2, HPN-SSH through 18.2.0, ProFTPD before 1.3.8b (and before 1.3.9rc2), ORYX CycloneSSH before 2.3.4, NetSarang XShell 7 before Build 0144, CrushFTP before 10.6.0, ConnectBot SSH library before 2.2.22, Apache MINA sshd through 2.11.0, sshj through 0.37.0, TinySSH through 20230101, trilead-ssh2 6401, LANCOM LCOS and LANconfig, FileZilla before 3.66.4, Nova before 11.8, PKIX-SSH before 14.4, SecureCRT before 9.4.3, Transmit5 before 5.10.4, Win32-OpenSSH before 9.5.0.0p1-Beta, WinSCP before 6.2.2, Bitvise SSH Server before 9.32, Bitvise SSH Client before 9.33, KiTTY through 0.76.1.13, the net-ssh gem 7.2.0 for Ruby, the mscdex ssh2 module before 1.15.0 for Node.js, the thrussh library before 0.35.1 for Rust, and the Russh crate before 0.40.2 for Rust.
+</div>
+              <div class="hloc">10.129.102.173:22</div>
+              <div style="margin-top:6px"><span class="tag">cve</span><span class="tag">cve2023</span><span class="tag">packetstorm</span><span class="tag">seclists</span><span class="tag">js</span></div>
+              
+              
+            </div>
+        <h3>Correlaciones</h3>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>FTP Service - Detect</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :21 corresponde a vsftpd 3.0.3</div>
+              <div class="vinc">Puerto 21/tcp → vsftpd 3.0.3</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>vsFTPd Service - Detect</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :21 corresponde a vsftpd 3.0.3</div>
+              <div class="vinc">Puerto 21/tcp → vsftpd 3.0.3</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>OpenSSH Service - Detect</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinc">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>SSH Password-based Authentication</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinc">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>SSH SHA-1 HMAC Algorithms Enabled</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinc">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>SSH Server Software Enumeration</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinc">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#8a6d12">Media</span>
+                <strong>OpenSSH Terrapin Attack - Detection</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinc">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>SSH Auth Methods - Detection</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinc">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>HTTP Missing Security Headers</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :80 corresponde a Gunicorn</div>
+              <div class="vinc">Puerto 80/tcp → Gunicorn</div>
+            </div>
+            <div class="corr">
+              <div class="ct">
+                <span class="sev-inline" style="color:#5b6570">Informativa</span>
+                <strong>Missing Subresource Integrity</strong>
+                <span class="conf">confianza media</span>
+              </div>
+              <div class="razon">Hallazgo en :80 corresponde a Gunicorn</div>
+              <div class="vinc">Puerto 80/tcp → Gunicorn</div>
+            </div>
+      </div>
+    </div>
+    </section>
+
+    
+    <section>
+      <h2><span class="n">04</span> Evidencia recopilada</h2>
+      
+      <p style="font-size:13.5px;color:var(--muted)">Salida cruda de cada herramienta,
+      conservada para auditoría y re-análisis. El archivo
+      <span class="mono">orquestacion.log</span> registra el flujo completo del escaneo.</p>
+      <table>
+        <thead><tr><th>Archivo</th><th>Tamaño</th></tr></thead>
+        <tbody><tr><td class="mono">dirb_10-129-102-173_db_80.txt</td><td class="tnum">0.4 KB</td></tr><tr><td class="mono">gobuster_10-129-102-173_gb_deep_80.jsonl</td><td class="tnum">0.3 KB</td></tr><tr><td class="mono">nmap_scan.xml</td><td class="tnum">12.1 KB</td></tr><tr><td class="mono">nuclei_10-129-102-173_ftp_21.jsonl</td><td class="tnum">1.7 KB</td></tr><tr><td class="mono">nuclei_10-129-102-173_http_80.jsonl</td><td class="tnum">298.9 KB</td></tr><tr><td class="mono">nuclei_10-129-102-173_openssh_22.jsonl</td><td class="tnum">1.2 KB</td></tr><tr><td class="mono">nuclei_10-129-102-173_ssh_22.jsonl</td><td class="tnum">25.0 KB</td></tr><tr><td class="mono">orquestacion.log</td><td class="tnum">0.9 KB</td></tr><tr><td class="mono">whatweb_10-129-102-173_ww_80.json</td><td class="tnum">0.4 KB</td></tr></tbody>
+      </table>
+    </section>
+
+    <div class="foot">
+      <span>ARES · Sistema automatizado de evaluación de seguridad</span>
+      <span>Generado 2026-08-26 17:11 UTC</span>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

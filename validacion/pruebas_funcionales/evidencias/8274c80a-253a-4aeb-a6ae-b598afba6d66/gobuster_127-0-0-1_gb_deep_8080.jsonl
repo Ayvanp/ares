@@ -1,0 +1,5 @@
+http://127.0.0.1:8080/README.md (Status: 200) [Size: 4405]
+http://127.0.0.1:8080/parsers (Status: 301) [Size: 0] [--> /parsers/]
+http://127.0.0.1:8080/reportes (Status: 301) [Size: 0] [--> /reportes/]
+http://127.0.0.1:8080/samples (Status: 301) [Size: 0] [--> /samples/]
+http://127.0.0.1:8080/tests (Status: 301) [Size: 0] [--> /tests/]

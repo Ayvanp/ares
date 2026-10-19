@@ -1,0 +1,21 @@
+[17:56:14] Iniciando orquestación de 10.129.166.234
+[17:56:14] [Nmap] Escaneando 10.129.166.234
+[17:56:31] [Nmap] Completado
+[17:56:31] Primera ronda: 6 tareas
+[17:56:31] [nuclei] Nmap identificó ssh en :22
+[17:57:20] [nuclei] Completado
+[17:57:20] [nuclei] Nmap detectó OpenSSH en :22
+[17:57:34] [nuclei] Completado
+[17:57:35] [whatweb] HTTP en :80
+[17:57:47] [whatweb] Completado
+[17:57:47] [gobuster] HTTP en :80
+[17:57:48] [gobuster] Omitido: Error: the server returns a status code that matches the provided options for non existing urls. http://10.129.166.234/89503afd-2959-4db5-9e8e-386aa58285d7 => 302 (Length: 154). To continue please exclude the status code or the length
+[17:57:48] [nuclei] HTTP en :80
+[17:58:49] [nuclei] Completado
+[17:58:49] [nuclei] Nmap detectó nginx en :80
+[17:59:05] [nuclei] Completado
+[17:59:05] Segunda/tercera ronda: 2 tareas adicionales
+[17:59:05] [nuclei] nginx 1.24.0 detectado por WhatWeb
+[17:59:18] [dirb] Gobuster no encontró rutas en :80 → dirb como respaldo
+[18:01:53] Guardando 8 resultados en BD
+[18:01:53] Orquestación completada. Evidencias en: evidencias/09d070c1-6bb3-43d3-83b5-0d7250425246

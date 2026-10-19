@@ -1,0 +1,3 @@
+[
+{"target":"https://fireflow.htb","http_status":200,"request_config":{"headers":{"User-Agent":"WhatWeb/0.5.5"}},"plugins":{"Country":{"string":["RESERVED"],"module":["ZZ"]},"Email":{"string":["ops@fireflow.htb"]},"HTML5":{},"HTTPServer":{"string":["nginx"]},"IP":{"string":["10.129.166.228"]},"nginx":{},"Title":{"string":["FireFlow — Task Force Nightfall"]},"UncommonHeaders":{"string":["x-content-type-options,referrer-policy"]},"X-Frame-Options":{"string":["ALLOW-FROM https://flow.fireflow.htb"]}}}
+]

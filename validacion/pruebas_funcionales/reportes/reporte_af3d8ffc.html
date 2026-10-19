@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARES — Reporte de Seguridad — 10.129.101.157</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa; color: #1a1a2e; font-size: 14px; }
+    .page { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    /* Encabezado */
+    .header { background: #1a1a2e; color: white; border-radius: 12px;
+               padding: 32px; margin-bottom: 24px; }
+    .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .header .meta { color: #94a3b8; font-size: 13px; }
+    .header .meta span { margin-right: 24px; }
+    .badge-riesgo { display: inline-block; padding: 4px 14px; border-radius: 20px;
+                     font-weight: 700; font-size: 13px; margin-top: 12px;
+                     background: #65a30d; color: white; }
+
+    /* Secciones */
+    .section { background: white; border-radius: 12px; padding: 24px;
+                margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .section h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px;
+                   color: #1a1a2e; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    .section h3 { font-size: 15px; font-weight: 600; margin: 16px 0 8px; color: #334155; }
+
+    /* Estadísticas */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                   gap: 12px; }
+    .stat-card { background: #f8f9fa; border-radius: 8px; padding: 16px;
+                  text-align: center; border: 1px solid #e2e8f0; }
+    .stat-card .numero { font-size: 32px; font-weight: 700; color: #1a1a2e; }
+    .stat-card .etiqueta { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+    /* Severidad */
+    .sev-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+    .sev-badge { padding: 8px 16px; border-radius: 8px; color: white; font-weight: 600;
+                  font-size: 13px; }
+
+    /* Tabla */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #f1f5f9; text-align: left; padding: 10px 12px;
+          font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 9px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    tr:hover td { background: #fafafa; }
+
+    /* Host */
+    .host-card { border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+    .host-header { background: #1e293b; color: white; padding: 14px 18px;
+                    display: flex; align-items: center; gap: 12px; }
+    .host-header .ip { font-size: 18px; font-weight: 700; font-family: monospace; }
+    .host-header .os { color: #94a3b8; font-size: 13px; }
+    .host-body { padding: 16px 18px; }
+
+    /* Hallazgo */
+    .hallazgo { border-left: 4px solid #e2e8f0; padding: 12px 16px;
+                 margin-bottom: 10px; background: #fafafa; border-radius: 0 8px 8px 0; }
+    .hallazgo-titulo { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .hallazgo-meta { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+    .hallazgo-desc { font-size: 13px; color: #475569; margin-bottom: 6px; }
+    .hallazgo-rem { font-size: 12px; color: #0f766e; background: #f0fdf4;
+                     padding: 6px 10px; border-radius: 4px; margin-top: 6px; }
+    .evidencia-box { background: #1e293b; color: #e2e8f0; padding: 10px;
+                      border-radius: 6px; font-family: monospace; font-size: 11px;
+                      margin-top: 6px; white-space: pre-wrap; word-break: break-all;
+                      max-height: 150px; overflow-y: auto; }
+
+    /* Correlación */
+    .corr { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
+             padding: 10px 14px; margin-bottom: 8px; }
+    .corr .conf { font-size: 11px; font-weight: 700; padding: 2px 8px;
+                   border-radius: 10px; }
+    .conf-alta { background: #dcfce7; color: #166534; }
+    .conf-media { background: #fef3c7; color: #92400e; }
+    .conf-baja { background: #f1f5f9; color: #475569; }
+    .vinculo { font-size: 12px; color: #475569; margin-top: 4px; }
+    .vinculo::before { content: "→ "; color: #3b82f6; font-weight: 600; }
+
+    /* Tags */
+    .tag { display: inline-block; background: #e2e8f0; color: #475569;
+            padding: 2px 8px; border-radius: 10px; font-size: 11px; margin: 2px; }
+    .codigo-200 { color: #166534; font-weight: 600; }
+    .codigo-301, .codigo-302 { color: #92400e; }
+    .codigo-403, .codigo-404 { color: #991b1b; }
+
+    /* Footer */
+    .footer { text-align: center; color: #94a3b8; font-size: 12px;
+               padding: 20px; margin-top: 8px; }
+
+    @media print {
+      body { background: white; }
+      .section { box-shadow: none; border: 1px solid #e2e8f0; }
+      .evidencia-box { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  
+  <div class="header">
+    <h1>Reporte de Seguridad</h1>
+    <div class="meta">
+      <span>🎯 <strong>10.129.101.157</strong></span>
+      <span>📅 2026-08-26 00:20:16</span>
+      <span>⏱ 8m 30s</span>
+      <span>📋 Perfil: COMPLETO</span>
+    </div>
+    <div>
+      <span class="badge-riesgo">RIESGO BAJO</span>
+    </div>
+    <div class="meta" style="margin-top:10px; font-size:11px; color:#64748b;">
+      ID: af3d8ffc-77cc-44bb-a2d2-c9523a502b11
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2>Resumen ejecutivo</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="numero">1</div>
+        <div class="etiqueta">Hosts activos</div>
+      </div>
+      <div class="stat-card">
+        <div class="numero">3</div>
+        <div class="etiqueta">Servicios</div>
+      </div>
+      <div class="stat-card">
+        <div class="numero">6</div>
+        <div class="etiqueta">Tecnologías</div>
+      </div>
+      <div class="stat-card">
+        <div class="numero">3</div>
+        <div class="etiqueta">Endpoints</div>
+      </div>
+      <div class="stat-card">
+        <div class="numero" style="color:#dc2626">10</div>
+        <div class="etiqueta">Hallazgos</div>
+      </div>
+    </div><h3 style="margin-top:20px">Por severidad</h3><div class="sev-grid"><div class="sev-badge" style="background:#d97706">🟡 MEDIUM (1)</div><div class="sev-badge" style="background:#6b7280">⚪ INFO (9)</div></div></div>
+  
+  <div class="section">
+    <h2>Herramientas ejecutadas</h2>
+    <table>
+      <tr><th>Herramienta</th><th>Estado</th></tr>
+      <tr><td><strong>nmap</strong></td><td>✅ completed</td></tr><tr><td><strong>nuclei_ftp_21</strong></td><td>✅ completed</td></tr><tr><td><strong>nuclei_ssh_22</strong></td><td>✅ completed</td></tr><tr><td><strong>nuclei_openssh_22</strong></td><td>✅ completed</td></tr><tr><td><strong>whatweb_ww_80</strong></td><td>✅ completed</td></tr><tr><td><strong>dirb_db_80</strong></td><td>✅ completed</td></tr><tr><td><strong>nuclei_http_80</strong></td><td>✅ completed</td></tr><tr><td><strong>nuclei</strong></td><td>✅ completed</td></tr><tr><td><strong>whatweb</strong></td><td>✅ completed</td></tr><tr><td><strong>dirb</strong></td><td>✅ completed</td></tr><tr><td><strong>gobuster</strong></td><td>✅ completed</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Detalle por host</h2>
+    
+    <div class="host-card">
+      <div class="host-header">
+        <div>
+          <div class="ip">10.129.101.157</div>
+          <div class="os">Linux 4.15 - 5.19 (100% precisión)</div>
+          
+        </div>
+      </div>
+      <div class="host-body">
+        
+        <h3>Servicios (3)</h3>
+        <table>
+          <tr><th>Puerto</th><th>Estado</th><th>Servicio</th><th>Producto / Versión</th></tr>
+          <tr>
+              <td><code>21/tcp</code></td>
+              <td style="color:#166534"><strong>open</strong></td>
+              <td>ftp</td>
+              <td>vsftpd 3.0.3</td>
+            </tr><tr>
+              <td><code>22/tcp</code></td>
+              <td style="color:#166534"><strong>open</strong></td>
+              <td>ssh</td>
+              <td>OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</td>
+            </tr><tr>
+              <td><code>80/tcp</code></td>
+              <td style="color:#166534"><strong>open</strong></td>
+              <td>http</td>
+              <td>Gunicorn</td>
+            </tr>
+        </table>
+        <h3>Tecnologías (6)</h3><div><span class="tag">Bootstrap  <em style="color:#94a3b8">(CSS Framework)</em></span><span class="tag">HTTPServer  <em style="color:#94a3b8">(Web Server)</em></span><span class="tag">JQuery 2.2.4 <em style="color:#94a3b8">(Other)</em></span><span class="tag">Modernizr 2.8.3.min <em style="color:#94a3b8">(Other)</em></span><span class="tag">Script  <em style="color:#94a3b8">(Other)</em></span><span class="tag">X-UA-Compatible  <em style="color:#94a3b8">(Other)</em></span></div>
+        
+        <h3>Endpoints descubiertos (3)</h3>
+        <table>
+          <tr><th>Código</th><th>Ruta</th></tr>
+          <tr>
+              <td class="codigo-200"><strong>200</strong></td>
+              <td><code>/ip</code></td>
+            </tr><tr>
+              <td class="codigo-200"><strong>200</strong></td>
+              <td><code>/netstat</code></td>
+            </tr><tr>
+              <td class="codigo-302"><strong>302</strong></td>
+              <td><code>/data</code> → http://10.129.101.157/</td>
+            </tr>
+        </table>
+        <h3>Hallazgos (10)</h3>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ FTP Service - Detect</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                
+                &nbsp;|&nbsp;<span style="color:#94a3b8">ftp-detect</span>
+              </div>
+              <div class="hallazgo-desc">FTP service was detected.
+</div>
+              <div style="font-size:12px;color:#475569">📍 10.129.101.157:21</div>
+              <span class="tag">network</span><span class="tag">ftp</span><span class="tag">detect</span><span class="tag">detection</span><span class="tag">tcp</span>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ vsFTPd Service - Detect</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                
+                &nbsp;|&nbsp;<span style="color:#94a3b8">vsftpd-detect</span>
+              </div>
+              <div class="hallazgo-desc">vsFTPd FTP service was detected.</div>
+              <div style="font-size:12px;color:#475569">📍 10.129.101.157:21</div>
+              <span class="tag">network</span><span class="tag">ftp</span><span class="tag">vsftpd</span><span class="tag">detect</span><span class="tag">tcp</span>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ OpenSSH Service - Detect</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                &nbsp;|&nbsp;<a href="https://nvd.nist.gov/vuln/detail/CVE-2016-6210" target="_blank" style="color:#3b82f6;font-size:12px">CVE-2016-6210</a> <a href="https://nvd.nist.gov/vuln/detail/CVE-2018-15473" target="_blank" style="color:#3b82f6;font-size:12px">CVE-2018-15473</a> 
+                &nbsp;|&nbsp;<span style="color:#94a3b8">openssh-detect</span>
+              </div>
+              <div class="hallazgo-desc">OpenSSH service was detected.
+</div>
+              <div style="font-size:12px;color:#475569">📍 10.129.101.157:22</div>
+              <span class="tag">seclists</span><span class="tag">network</span><span class="tag">ssh</span><span class="tag">openssh</span><span class="tag">detect</span>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ SSH Password-based Authentication</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                
+                &nbsp;|&nbsp;<span style="color:#94a3b8">ssh-password-auth</span>
+              </div>
+              
+              <div style="font-size:12px;color:#475569">📍 10.129.101.157:22</div>
+              <span class="tag">ssh</span><span class="tag">js</span><span class="tag">enum</span><span class="tag">network</span><span class="tag">discovery</span>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ SSH SHA-1 HMAC Algorithms Enabled</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                
+                &nbsp;|&nbsp;<span style="color:#94a3b8">ssh-sha1-hmac-algo</span>
+              </div>
+              <div class="hallazgo-desc">The SSH server at the remote end is set up to allow the use of SHA-1 HMAC algorithms.
+</div>
+              <div style="font-size:12px;color:#475569">📍 10.129.101.157:22</div>
+              <span class="tag">enum</span><span class="tag">js</span><span class="tag">ssh</span><span class="tag">misconfig</span><span class="tag">network</span>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ SSH Server Software Enumeration</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                
+                &nbsp;|&nbsp;<span style="color:#94a3b8">ssh-server-enumeration</span>
+              </div>
+              
+              <div style="font-size:12px;color:#475569">📍 10.129.101.157:22</div>
+              <span class="tag">js</span><span class="tag">ssh</span><span class="tag">enum</span><span class="tag">network</span><span class="tag">discovery</span>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ SSH Auth Methods - Detection</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                
+                &nbsp;|&nbsp;<span style="color:#94a3b8">ssh-auth-methods</span>
+              </div>
+              <div class="hallazgo-desc">SSH (Secure Shell) authentication modes are methods used to verify the identity of users and ensure secure access to remote systems. Common SSH authentication modes include password-based authentication, which relies on a secret passphrase, and public key authentication, which uses cryptographic keys for a more secure and convenient login process. Additionally, multi-factor authentication (MFA) can be employed to enhance security by requiring users to provide multiple forms of authentication, such as a password and a one-time code.
+</div>
+              <div style="font-size:12px;color:#475569">📍 10.129.101.157:22</div>
+              <span class="tag">js</span><span class="tag">detect</span><span class="tag">ssh</span><span class="tag">enum</span><span class="tag">network</span>
+              
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ HTTP Missing Security Headers</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                
+                &nbsp;|&nbsp;<span style="color:#94a3b8">http-missing-security-headers</span>
+              </div>
+              <div class="hallazgo-desc">This template searches for missing HTTP security headers. The impact of these missing headers can vary.
+</div>
+              <div style="font-size:12px;color:#475569">📍 http://10.129.101.157</div>
+              <span class="tag">misconfig</span><span class="tag">headers</span><span class="tag">generic</span><span class="tag">vuln</span>
+              <div class="evidencia-box">curl -X 'GET' -d '' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0' 'http://10.129.101.157'</div>
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#6b7280">
+              <div class="hallazgo-titulo">⚪ Missing Subresource Integrity</div>
+              <div class="hallazgo-meta">
+                <span style="color:#6b7280;font-weight:600">INFO</span>
+                
+                
+                &nbsp;|&nbsp;<span style="color:#94a3b8">missing-sri</span>
+              </div>
+              <div class="hallazgo-desc">Checks if external script and stylesheet tags in the HTML response are missing the Subresource Integrity (SRI) attribute.
+</div>
+              <div style="font-size:12px;color:#475569">📍 http://10.129.101.157/</div>
+              <span class="tag">compliance</span><span class="tag">js</span><span class="tag">css</span><span class="tag">sri</span><span class="tag">misconfig</span>
+              <div class="evidencia-box">curl -X 'GET' -d '' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (ZZ; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36' 'http://10.129.101.157/'</div>
+              
+            </div>
+            <div class="hallazgo" style="border-left-color:#d97706">
+              <div class="hallazgo-titulo">🟡 OpenSSH Terrapin Attack - Detection</div>
+              <div class="hallazgo-meta">
+                <span style="color:#d97706;font-weight:600">MEDIUM</span>
+                
+                &nbsp;|&nbsp;<a href="https://nvd.nist.gov/vuln/detail/cve-2023-48795" target="_blank" style="color:#3b82f6;font-size:12px">cve-2023-48795</a> 
+                &nbsp;|&nbsp;<span style="color:#94a3b8">CVE-2023-48795</span>
+              </div>
+              <div class="hallazgo-desc">The SSH transport protocol with certain OpenSSH extensions, found in OpenSSH before 9.6 and other products, allows remote attackers to bypass integrity checks such that some packets are omitted (from the extension negotiation message), and a client and server may consequently end up with a connection for which some security features have been downgraded or disabled, aka a Terrapin attack. This occurs because the SSH Binary Packet Protocol (BPP), implemented by these extensions, mishandles the handshake phase and mishandles use of sequence numbers. For example, there is an effective attack against SSH's use of ChaCha20-Poly1305 (and CBC with Encrypt-then-MAC). The bypass occurs in chacha20-poly1305@openssh.com and (if CBC is used) the -etm@openssh.com MAC algorithms. This also affects Maverick Synergy Java SSH API before 3.1.0-SNAPSHOT, Dropbear through 2022.83, Ssh before 5.1.1 in Erlang/OTP, PuTTY before 0.80, AsyncSSH before 2.14.2, golang.org/x/crypto before 0.17.0, libssh before 0.10.6, libssh2 through 1.11.0, Thorn Tech SFTP Gateway before 3.4.6, Tera Term before 5.1, Paramiko before 3.4.0, jsch before 0.2.15, SFTPGo before 2.5.6, Netgate pfSense Plus through 23.09.1, Netgate pfSense CE through 2.7.2, HPN-SSH through 18.2.0, ProFTPD before 1.3.8b (and before 1.3.9rc2), ORYX CycloneSSH before 2.3.4, NetSarang XShell 7 before Build 0144, CrushFTP before 10.6.0, ConnectBot SSH library before 2.2.22, Apache MINA sshd through 2.11.0, sshj through 0.37.0, TinySSH through 20230101, trilead-ssh2 6401, LANCOM LCOS and LANconfig, FileZilla before 3.66.4, Nova before 11.8, PKIX-SSH before 14.4, SecureCRT before 9.4.3, Transmit5 before 5.10.4, Win32-OpenSSH before 9.5.0.0p1-Beta, WinSCP before 6.2.2, Bitvise SSH Server before 9.32, Bitvise SSH Client before 9.33, KiTTY through 0.76.1.13, the net-ssh gem 7.2.0 for Ruby, the mscdex ssh2 module before 1.15.0 for Node.js, the thrussh library before 0.35.1 for Rust, and the Russh crate before 0.40.2 for Rust.
+</div>
+              <div style="font-size:12px;color:#475569">📍 10.129.101.157:22</div>
+              <span class="tag">cve</span><span class="tag">cve2023</span><span class="tag">packetstorm</span><span class="tag">seclists</span><span class="tag">js</span>
+              
+              
+            </div>
+        <h3>Correlaciones</h3>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>FTP Service - Detect</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :21 corresponde a vsftpd 3.0.3</div>
+              <div class="vinculo">Puerto 21/tcp → vsftpd 3.0.3</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>vsFTPd Service - Detect</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :21 corresponde a vsftpd 3.0.3</div>
+              <div class="vinculo">Puerto 21/tcp → vsftpd 3.0.3</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>OpenSSH Service - Detect</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinculo">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>SSH Password-based Authentication</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinculo">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>SSH SHA-1 HMAC Algorithms Enabled</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinculo">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>SSH Server Software Enumeration</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinculo">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#d97706;font-weight:600">[MEDIUM]</span>
+                <strong>OpenSSH Terrapin Attack - Detection</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinculo">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>SSH Auth Methods - Detection</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :22 corresponde a OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+              <div class="vinculo">Puerto 22/tcp → OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>HTTP Missing Security Headers</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :80 corresponde a Gunicorn</div>
+              <div class="vinculo">Puerto 80/tcp → Gunicorn</div>
+            </div>
+            <div class="corr">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="color:#6b7280;font-weight:600">[INFO]</span>
+                <strong>Missing Subresource Integrity</strong>
+                <span class="conf conf-media">MEDIA</span>
+              </div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hallazgo en :80 corresponde a Gunicorn</div>
+              <div class="vinculo">Puerto 80/tcp → Gunicorn</div>
+            </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Generado por ARES — 2026-08-26 00:38 UTC &nbsp;|&nbsp;
+    Sistema automatizado de evaluación de seguridad
+  </div>
+
+</div>
+</body>
+</html>

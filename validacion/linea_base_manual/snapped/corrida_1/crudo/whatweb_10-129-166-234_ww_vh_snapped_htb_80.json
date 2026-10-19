@@ -1,0 +1,3 @@
+[
+{"target":"http://snapped.htb","http_status":200,"request_config":{"headers":{"User-Agent":"WhatWeb/0.5.5"}},"plugins":{"Country":{"string":["RESERVED"],"module":["ZZ"]},"Email":{"string":["contact@snapped.htb"]},"HTML5":{},"HTTPServer":{"os":["Ubuntu Linux"],"string":["nginx/1.24.0 (Ubuntu)"]},"IP":{"string":["10.129.166.234"]},"nginx":{"version":["1.24.0"]},"Script":{},"Title":{"string":["Snapped — Infrastructure. Orchestration. Control."]}}}
+]

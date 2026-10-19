@@ -1,0 +1,1 @@
+[1m[34mhttps://10.129.166.228[0m [301 Moved Permanently] [1mCountry[0m[[0m[22mRESERVED[0m][[1m[31mZZ[0m], [1mHTTPServer[0m[[1m[36mnginx[0m], [1mIP[0m[[0m[22m10.129.166.228[0m], [1mRedirectLocation[0m[[0m[22mhttps://fireflow.htb/[0m], [1mTitle[0m[[1m[33m301 Moved Permanently[0m], [1mnginx[0m

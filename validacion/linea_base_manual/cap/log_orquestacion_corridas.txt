@@ -1,0 +1,181 @@
+[2026-10-14 13:29:07] ================ Maquina=cap  IP=10.129.166.225 ================
+[2026-10-14 13:29:07] >>> MANUAL corrida 1  (salida: corrida_1\)
+
+[paso 1] nmap (base)
+          razon : Escaneo base de puertos, versiones y sistema operativo
+          cmd   : nmap -sV -sC -O -T4 -oX /out/corrida_1/crudo/nmap_10-129-166-225_base.xml 10.129.166.225
+          -> codigo=0  duracion=21.0s  evidencia=12369B
+
+[plan] primera ronda: 6 tareas
+
+[paso 2] nuclei (ftp_21)
+          razon : Nmap identificó ftp en :21
+          cmd   : nuclei -target 10.129.166.225:21 -tags ftp -jsonl -o /out/corrida_1/crudo/nuclei_10-129-166-225_ftp_21.jsonl -silent
+          -> codigo=0  duracion=39.1s  evidencia=1702B
+
+[paso 3] nuclei (ssh_22)
+          razon : Nmap identificó ssh en :22
+          cmd   : nuclei -target 10.129.166.225:22 -tags ssh -jsonl -o /out/corrida_1/crudo/nuclei_10-129-166-225_ssh_22.jsonl -silent
+          -> codigo=0  duracion=19.9s  evidencia=25324B
+
+[paso 4] nuclei (openssh_22)
+          razon : Nmap detectó OpenSSH en :22
+          cmd   : nuclei -target 10.129.166.225:22 -tags openssh -jsonl -o /out/corrida_1/crudo/nuclei_10-129-166-225_openssh_22.jsonl -silent
+          -> codigo=0  duracion=9.3s  evidencia=1221B
+
+[paso 5] whatweb (ww_80)
+          razon : HTTP en :80
+          cmd   : whatweb http://10.129.166.225 --log-json /out/corrida_1/crudo/whatweb_10-129-166-225_ww_80.json --no-errors
+          -> codigo=0  duracion=13.6s  evidencia=441B
+
+[paso 6] gobuster (gb_80)
+          razon : HTTP en :80
+          cmd   : gobuster dir -u http://10.129.166.225 -w /usr/share/dirb/wordlists/big.txt --no-progress -o /out/corrida_1/crudo/gobuster_10-129-166-225_gb_80.jsonl -q -t 80 -e -b 404,500,503 --timeout 15s
+          -> codigo=0  duracion=54.3s  evidencia=344B
+
+[paso 7] nuclei (http_80)
+          razon : HTTP en :80
+          cmd   : nuclei -target http://10.129.166.225 -tags http,exposure,misconfig -jsonl -o /out/corrida_1/crudo/nuclei_10-129-166-225_http_80.jsonl -silent
+          -> codigo=0  duracion=90.0s  evidencia=305821B
+
+[OK] corrida 1 de cap terminada. JSON: /out/corrida_1/corrida_1.json
+     comandos=7  wall=248.8s  suma_herramientas=247.1s
+[2026-10-14 13:33:18] <<< MANUAL corrida 1  exit=0  wall=250.5s
+[2026-10-14 13:33:18] >>> MANUAL corrida 2  (salida: corrida_2\)
+
+[paso 1] nmap (base)
+          razon : Escaneo base de puertos, versiones y sistema operativo
+          cmd   : nmap -sV -sC -O -T4 -oX /out/corrida_2/crudo/nmap_10-129-166-225_base.xml 10.129.166.225
+          -> codigo=0  duracion=19.4s  evidencia=12733B
+
+[plan] primera ronda: 6 tareas
+
+[paso 2] nuclei (ftp_21)
+          razon : Nmap identificó ftp en :21
+          cmd   : nuclei -target 10.129.166.225:21 -tags ftp -jsonl -o /out/corrida_2/crudo/nuclei_10-129-166-225_ftp_21.jsonl -silent
+          -> codigo=0  duracion=31.4s  evidencia=1702B
+
+[paso 3] nuclei (ssh_22)
+          razon : Nmap identificó ssh en :22
+          cmd   : nuclei -target 10.129.166.225:22 -tags ssh -jsonl -o /out/corrida_2/crudo/nuclei_10-129-166-225_ssh_22.jsonl -silent
+          -> codigo=0  duracion=16.7s  evidencia=25325B
+
+[paso 4] nuclei (openssh_22)
+          razon : Nmap detectó OpenSSH en :22
+          cmd   : nuclei -target 10.129.166.225:22 -tags openssh -jsonl -o /out/corrida_2/crudo/nuclei_10-129-166-225_openssh_22.jsonl -silent
+          -> codigo=0  duracion=7.6s  evidencia=1220B
+
+[paso 5] whatweb (ww_80)
+          razon : HTTP en :80
+          cmd   : whatweb http://10.129.166.225 --log-json /out/corrida_2/crudo/whatweb_10-129-166-225_ww_80.json --no-errors
+          -> codigo=0  duracion=3.9s  evidencia=441B
+
+[paso 6] gobuster (gb_80)
+          razon : HTTP en :80
+          cmd   : gobuster dir -u http://10.129.166.225 -w /usr/share/dirb/wordlists/big.txt --no-progress -o /out/corrida_2/crudo/gobuster_10-129-166-225_gb_80.jsonl -q -t 80 -e -b 404,500,503 --timeout 15s
+          -> codigo=0  duracion=50.6s  evidencia=344B
+
+[paso 7] nuclei (http_80)
+          razon : HTTP en :80
+          cmd   : nuclei -target http://10.129.166.225 -tags http,exposure,misconfig -jsonl -o /out/corrida_2/crudo/nuclei_10-129-166-225_http_80.jsonl -silent
+          -> codigo=0  duracion=72.8s  evidencia=305003B
+
+[OK] corrida 2 de cap terminada. JSON: /out/corrida_2/corrida_2.json
+     comandos=7  wall=204.4s  suma_herramientas=202.4s
+[2026-10-14 13:36:45] <<< MANUAL corrida 2  exit=0  wall=207.3s
+[2026-10-14 13:36:45] >>> MANUAL corrida 3  (salida: corrida_3\)
+
+[paso 1] nmap (base)
+          razon : Escaneo base de puertos, versiones y sistema operativo
+          cmd   : nmap -sV -sC -O -T4 -oX /out/corrida_3/crudo/nmap_10-129-166-225_base.xml 10.129.166.225
+          -> codigo=0  duracion=19.2s  evidencia=12738B
+
+[plan] primera ronda: 6 tareas
+
+[paso 2] nuclei (ftp_21)
+          razon : Nmap identificó ftp en :21
+          cmd   : nuclei -target 10.129.166.225:21 -tags ftp -jsonl -o /out/corrida_3/crudo/nuclei_10-129-166-225_ftp_21.jsonl -silent
+          -> codigo=0  duracion=59.0s  evidencia=1702B
+
+[paso 3] nuclei (ssh_22)
+          razon : Nmap identificó ssh en :22
+          cmd   : nuclei -target 10.129.166.225:22 -tags ssh -jsonl -o /out/corrida_3/crudo/nuclei_10-129-166-225_ssh_22.jsonl -silent
+          -> codigo=0  duracion=16.6s  evidencia=24103B
+
+[paso 4] nuclei (openssh_22)
+          razon : Nmap detectó OpenSSH en :22
+          cmd   : nuclei -target 10.129.166.225:22 -tags openssh -jsonl -o /out/corrida_3/crudo/nuclei_10-129-166-225_openssh_22.jsonl -silent
+          -> codigo=0  duracion=6.9s  evidencia=1221B
+
+[paso 5] whatweb (ww_80)
+          razon : HTTP en :80
+          cmd   : whatweb http://10.129.166.225 --log-json /out/corrida_3/crudo/whatweb_10-129-166-225_ww_80.json --no-errors
+          -> codigo=0  duracion=3.7s  evidencia=441B
+
+[paso 6] gobuster (gb_80)
+          razon : HTTP en :80
+          cmd   : gobuster dir -u http://10.129.166.225 -w /usr/share/dirb/wordlists/big.txt --no-progress -o /out/corrida_3/crudo/gobuster_10-129-166-225_gb_80.jsonl -q -t 80 -e -b 404,500,503 --timeout 15s
+          -> codigo=0  duracion=45.0s  evidencia=344B
+
+[paso 7] nuclei (http_80)
+          razon : HTTP en :80
+          cmd   : nuclei -target http://10.129.166.225 -tags http,exposure,misconfig -jsonl -o /out/corrida_3/crudo/nuclei_10-129-166-225_http_80.jsonl -silent
+          -> codigo=0  duracion=72.3s  evidencia=305793B
+
+[OK] corrida 3 de cap terminada. JSON: /out/corrida_3/corrida_3.json
+     comandos=7  wall=224.7s  suma_herramientas=222.8s
+[2026-10-14 13:40:33] <<< MANUAL corrida 3  exit=0  wall=228s
+[2026-10-14 13:40:33] >>> ARES: arrancando API...
+[2026-10-14 13:40:41] ARES API arriba. Lanzando escaneo perfil=completo...
+[ares] escaneo_id=19a18d6c-46f1-4c19-a6ae-9886990c359b target=10.129.166.225 perfil=completo
+[ares] estado=pending tareas=0/1
+[ares] estado=running tareas=0/1
+[ares] estado=running tareas=0/1
+[ares] estado=running tareas=0/1
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=1/2
+[ares] estado=running tareas=2/3
+[ares] estado=running tareas=2/3
+[ares] estado=running tareas=2/3
+[ares] estado=running tareas=2/3
+[ares] estado=running tareas=2/3
+[ares] estado=running tareas=3/4
+[ares] estado=running tareas=3/4
+[ares] estado=running tareas=4/5
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=5/6
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=running tareas=6/7
+[ares] estado=completed tareas=7/7
+[ares] estado_final=completed  duracion_api=223.143s  wall=226.7s  -> /out/ares_escaneo.json
+[2026-10-14 13:44:30] ARES escaneo exit=0
+[2026-10-14 13:44:30] ================ FIN cap  wall_total=15.4min ================
+
+[exited with code 0]

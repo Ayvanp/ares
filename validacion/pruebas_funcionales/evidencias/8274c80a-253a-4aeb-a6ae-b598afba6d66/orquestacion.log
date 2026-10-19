@@ -1,0 +1,23 @@
+[16:37:44] Iniciando orquestación de 127.0.0.1
+[16:37:44] [Nmap] Escaneando 127.0.0.1
+[16:37:53] [Nmap] Completado
+[16:37:53] Primera ronda: 7 tareas
+[16:37:53] [nuclei] Nmap identificó postgresql en :5432
+[16:41:07] [nuclei] Completado
+[16:41:07] [whatweb] HTTP en :8000
+[16:41:10] [whatweb] Completado
+[16:41:10] [dirb] HTTP en :8000
+[16:41:12] [dirb] Completado
+[16:41:12] [nuclei] HTTP en :8000
+[16:44:49] [nuclei] Completado
+[16:44:49] [whatweb] HTTP en :8080
+[16:44:53] [whatweb] Completado
+[16:44:53] [dirb] HTTP en :8080
+[16:44:57] [dirb] Completado
+[16:44:57] [nuclei] HTTP en :8080
+[16:48:35] [nuclei] Completado
+[16:48:35] Segunda/tercera ronda: 2 tareas adicionales
+[16:48:35] [gobuster] dirb encontró solo 1 resultado(s) en :8000 → Gobuster más profundo
+[16:48:41] [gobuster] dirb encontró solo 2 resultado(s) en :8080 → Gobuster más profundo
+[16:48:55] Guardando 10 resultados en BD
+[16:48:55] Orquestación completada. Evidencias en: evidencias/8274c80a-253a-4aeb-a6ae-b598afba6d66

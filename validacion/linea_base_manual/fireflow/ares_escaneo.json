@@ -1,0 +1,123 @@
+{
+  "herramienta_medida": "ARES (API)",
+  "ip": "10.129.166.228",
+  "perfil": "completo",
+  "escaneo_id": "8177df36-16ba-42e7-89e1-6f35b59435f9",
+  "estado_final": "completed",
+  "creado_en": "2026-10-14 17:04:57.453532",
+  "completado_en": "2026-10-14 17:08:46.132358",
+  "duracion_api_s": 228.679,
+  "duracion_wall_s": 232.448,
+  "n_tareas": 11,
+  "tareas": [
+    {
+      "herramienta": "nmap",
+      "estado": "completed",
+      "comando": "nmap -sV -sC -O -T4 -oX /tmp/ares_46nkpqhf/nmap.xml 10.129.166.228",
+      "razon": "Escaneo base de puertos, versiones y sistema operativo",
+      "iniciado": "2026-10-14 17:04:57.874933",
+      "terminado": "2026-10-14 17:05:29.667948",
+      "duracion_s": 31.793
+    },
+    {
+      "herramienta": "nuclei_ssh_22",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.228:22 -tags ssh -jsonl -o /tmp/ares_46nkpqhf/nuclei_10-129-166-228_ssh_22.jsonl -silent",
+      "razon": "Nmap identificó ssh en :22",
+      "iniciado": "2026-10-14 17:05:29.769958",
+      "terminado": "2026-10-14 17:06:06.498895",
+      "duracion_s": 36.729
+    },
+    {
+      "herramienta": "nuclei_openssh_22",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.228:22 -tags openssh -jsonl -o /tmp/ares_46nkpqhf/nuclei_10-129-166-228_openssh_22.jsonl -silent",
+      "razon": "Nmap detectó OpenSSH en :22",
+      "iniciado": "2026-10-14 17:06:06.553793",
+      "terminado": "2026-10-14 17:06:18.551181",
+      "duracion_s": 11.997
+    },
+    {
+      "herramienta": "whatweb_ww_443",
+      "estado": "completed",
+      "comando": "whatweb https://10.129.166.228 --log-json /tmp/ares_46nkpqhf/whatweb_10-129-166-228_ww_443.json --no-errors",
+      "razon": "HTTP en :443",
+      "iniciado": "2026-10-14 17:06:18.721254",
+      "terminado": "2026-10-14 17:06:27.203388",
+      "duracion_s": 8.482
+    },
+    {
+      "herramienta": "gobuster_gb_443",
+      "estado": "skipped",
+      "comando": "gobuster dir -u https://10.129.166.228 -w /usr/share/dirb/wordlists/big.txt --no-progress -o /tmp/ares_46nkpqhf/gobuster_10-129-166-228_gb_443.jsonl -q -t 80 -e -b 404,500,503 --timeout 15s -k",
+      "razon": "HTTP en :443",
+      "iniciado": "2026-10-14 17:06:27.441988",
+      "terminado": null,
+      "duracion_s": null
+    },
+    {
+      "herramienta": "nuclei_http_443",
+      "estado": "completed",
+      "comando": "nuclei -target https://10.129.166.228 -tags http,exposure,misconfig -jsonl -o /tmp/ares_46nkpqhf/nuclei_10-129-166-228_http_443.jsonl -silent",
+      "razon": "HTTP en :443",
+      "iniciado": "2026-10-14 17:06:28.555163",
+      "terminado": "2026-10-14 17:08:00.259402",
+      "duracion_s": 91.704
+    },
+    {
+      "herramienta": "nuclei_nginx_443",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.228:443 -tags nginx -jsonl -o /tmp/ares_46nkpqhf/nuclei_10-129-166-228_nginx_443.jsonl -silent",
+      "razon": "Nmap detectó nginx en :443",
+      "iniciado": "2026-10-14 17:08:00.298726",
+      "terminado": "2026-10-14 17:08:10.670354",
+      "duracion_s": 10.372
+    },
+    {
+      "herramienta": "nuclei_tech_nginx",
+      "estado": "completed",
+      "comando": "nuclei -target http://10.129.166.228 -tags nginx -jsonl -o /tmp/ares_46nkpqhf/nuclei_10-129-166-228_tech_nginx.jsonl -silent",
+      "razon": "nginx  detectado por WhatWeb",
+      "iniciado": "2026-10-14 17:08:10.782976",
+      "terminado": "2026-10-14 17:08:24.517985",
+      "duracion_s": 13.735
+    },
+    {
+      "herramienta": "dirb_db_fb_443",
+      "estado": "completed",
+      "comando": "dirb https://10.129.166.228 /usr/share/dirb/wordlists/small.txt -o /tmp/ares_46nkpqhf/dirb_10-129-166-228_db_fb_443.txt -S -r",
+      "razon": "Gobuster no encontró rutas en :443 → dirb como respaldo",
+      "iniciado": "2026-10-14 17:08:24.635336",
+      "terminado": "2026-10-14 17:08:25.426031",
+      "duracion_s": 0.791
+    },
+    {
+      "herramienta": "whatweb_ww_vh_fireflow_htb_443",
+      "estado": "completed",
+      "comando": "whatweb https://fireflow.htb --log-json /tmp/ares_46nkpqhf/whatweb_10-129-166-228_ww_vh_fireflow_htb_443.json --no-errors",
+      "razon": "vHost fireflow.htb en :443",
+      "iniciado": "2026-10-14 17:08:25.608733",
+      "terminado": "2026-10-14 17:08:31.150194",
+      "duracion_s": 5.541
+    },
+    {
+      "herramienta": "gobuster_gb_vh_fireflow_htb_443",
+      "estado": "completed",
+      "comando": "gobuster dir -u https://fireflow.htb -w /usr/share/dirb/wordlists/common.txt --no-progress -o /tmp/ares_46nkpqhf/gobuster_10-129-166-228_gb_vh_fireflow_htb_443.jsonl -q -t 80 -e -b 404,500,503 --timeout 15s -k",
+      "razon": "vHost fireflow.htb en :443",
+      "iniciado": "2026-10-14 17:08:31.352597",
+      "terminado": "2026-10-14 17:08:45.566975",
+      "duracion_s": 14.214
+    }
+  ],
+  "resumen": {
+    "activos": 2,
+    "servicios": 8,
+    "tecnologias": 6,
+    "endpoints": 1,
+    "hallazgos": 2,
+    "por_severidad": {
+      "info": 2
+    }
+  }
+}

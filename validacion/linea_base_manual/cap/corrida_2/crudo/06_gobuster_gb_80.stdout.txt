@@ -1,0 +1,4 @@
+[2Khttp://10.129.166.225/data                 (Status: 302) [Size: 208] [--> http://10.129.166.225/]
+[2Khttp://10.129.166.225/capture              (Status: 302) [Size: 220] [--> http://10.129.166.225/data/1]
+[2Khttp://10.129.166.225/ip                   (Status: 200) [Size: 17457]
+[2Khttp://10.129.166.225/netstat              (Status: 200) [Size: 38815]

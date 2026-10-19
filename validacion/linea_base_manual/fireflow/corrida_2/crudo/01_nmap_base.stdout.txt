@@ -1,0 +1,35 @@
+Starting Nmap 7.95 ( https://nmap.org ) at 2026-10-14 16:58 UTC
+Nmap scan report for fireflow.htb (10.129.166.228)
+Host is up (0.13s latency).
+Not shown: 992 closed tcp ports (reset)
+PORT      STATE    SERVICE   VERSION
+22/tcp    open     ssh       OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 0c:4b:d2:76:ab:10:06:92:05:dc:f7:55:94:7f:18:df (ECDSA)
+|_  256 2d:6d:4a:4c:ee:2e:11:b6:c8:90:e6:83:e9:df:38:b0 (ED25519)
+443/tcp   open     ssl/http  nginx
+| tls-alpn: 
+|   http/1.1
+|   http/1.0
+|_  http/0.9
+|_http-title: FireFlow \xE2\x80\x94 Task Force Nightfall
+| ssl-cert: Subject: commonName=fireflow.htb/organizationName=Task Force Nightfall/countryName=US
+| Subject Alternative Name: DNS:fireflow.htb, DNS:*.fireflow.htb
+| Not valid before: 2026-04-14T16:35:31
+|_Not valid after:  2028-07-17T16:35:31
+|_ssl-date: TLS randomness does not represent time
+9100/tcp  filtered jetdirect
+30000/tcp filtered ndmps
+30718/tcp filtered unknown
+30951/tcp filtered unknown
+31038/tcp filtered unknown
+31337/tcp filtered Elite
+Device type: general purpose|router
+Running: Linux 4.X|5.X, MikroTik RouterOS 7.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3
+OS details: Linux 4.15 - 5.19, MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3)
+Network Distance: 2 hops
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 30.90 seconds

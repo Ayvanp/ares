@@ -1,0 +1,105 @@
+{
+  "herramienta_medida": "ARES (API)",
+  "ip": "10.129.166.234",
+  "perfil": "completo",
+  "escaneo_id": "09d070c1-6bb3-43d3-83b5-0d7250425246",
+  "estado_final": "completed",
+  "creado_en": "2026-10-14 17:56:14.572771",
+  "completado_en": "2026-10-14 18:01:53.394064",
+  "duracion_api_s": 338.821,
+  "duracion_wall_s": 342.335,
+  "n_tareas": 9,
+  "tareas": [
+    {
+      "herramienta": "nmap",
+      "estado": "completed",
+      "comando": "nmap -sV -sC -O -T4 -oX /tmp/ares_kxrc_i_g/nmap.xml 10.129.166.234",
+      "razon": "Escaneo base de puertos, versiones y sistema operativo",
+      "iniciado": "2026-10-14 17:56:14.925398",
+      "terminado": "2026-10-14 17:56:31.729112",
+      "duracion_s": 16.804
+    },
+    {
+      "herramienta": "nuclei_ssh_22",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.234:22 -tags ssh -jsonl -o /tmp/ares_kxrc_i_g/nuclei_10-129-166-234_ssh_22.jsonl -silent",
+      "razon": "Nmap identificó ssh en :22",
+      "iniciado": "2026-10-14 17:56:31.827623",
+      "terminado": "2026-10-14 17:57:20.872101",
+      "duracion_s": 49.044
+    },
+    {
+      "herramienta": "nuclei_openssh_22",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.234:22 -tags openssh -jsonl -o /tmp/ares_kxrc_i_g/nuclei_10-129-166-234_openssh_22.jsonl -silent",
+      "razon": "Nmap detectó OpenSSH en :22",
+      "iniciado": "2026-10-14 17:57:20.972488",
+      "terminado": "2026-10-14 17:57:35.040351",
+      "duracion_s": 14.068
+    },
+    {
+      "herramienta": "whatweb_ww_80",
+      "estado": "completed",
+      "comando": "whatweb http://10.129.166.234 --log-json /tmp/ares_kxrc_i_g/whatweb_10-129-166-234_ww_80.json --no-errors",
+      "razon": "HTTP en :80",
+      "iniciado": "2026-10-14 17:57:35.177152",
+      "terminado": "2026-10-14 17:57:47.111272",
+      "duracion_s": 11.934
+    },
+    {
+      "herramienta": "gobuster_gb_80",
+      "estado": "skipped",
+      "comando": "gobuster dir -u http://10.129.166.234 -w /usr/share/dirb/wordlists/big.txt --no-progress -o /tmp/ares_kxrc_i_g/gobuster_10-129-166-234_gb_80.jsonl -q -t 80 -e -b 404,500,503 --timeout 15s",
+      "razon": "HTTP en :80",
+      "iniciado": "2026-10-14 17:57:47.222135",
+      "terminado": null,
+      "duracion_s": null
+    },
+    {
+      "herramienta": "nuclei_http_80",
+      "estado": "completed",
+      "comando": "nuclei -target http://10.129.166.234 -tags http,exposure,misconfig -jsonl -o /tmp/ares_kxrc_i_g/nuclei_10-129-166-234_http_80.jsonl -silent",
+      "razon": "HTTP en :80",
+      "iniciado": "2026-10-14 17:57:48.139864",
+      "terminado": "2026-10-14 17:58:49.359551",
+      "duracion_s": 61.22
+    },
+    {
+      "herramienta": "nuclei_nginx_80",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.234:80 -tags nginx -jsonl -o /tmp/ares_kxrc_i_g/nuclei_10-129-166-234_nginx_80.jsonl -silent",
+      "razon": "Nmap detectó nginx en :80",
+      "iniciado": "2026-10-14 17:58:49.460990",
+      "terminado": "2026-10-14 17:59:05.361976",
+      "duracion_s": 15.901
+    },
+    {
+      "herramienta": "nuclei_tech_nginx",
+      "estado": "completed",
+      "comando": "nuclei -target http://10.129.166.234 -tags nginx -jsonl -o /tmp/ares_kxrc_i_g/nuclei_10-129-166-234_tech_nginx.jsonl -silent",
+      "razon": "nginx 1.24.0 detectado por WhatWeb",
+      "iniciado": "2026-10-14 17:59:05.500719",
+      "terminado": "2026-10-14 17:59:18.100449",
+      "duracion_s": 12.6
+    },
+    {
+      "herramienta": "dirb_db_fb_80",
+      "estado": "completed",
+      "comando": "dirb http://10.129.166.234 /usr/share/dirb/wordlists/small.txt -o /tmp/ares_kxrc_i_g/dirb_10-129-166-234_db_fb_80.txt -S -r",
+      "razon": "Gobuster no encontró rutas en :80 → dirb como respaldo",
+      "iniciado": "2026-10-14 17:59:18.232013",
+      "terminado": "2026-10-14 18:01:53.059200",
+      "duracion_s": 154.827
+    }
+  ],
+  "resumen": {
+    "activos": 1,
+    "servicios": 2,
+    "tecnologias": 2,
+    "endpoints": 0,
+    "hallazgos": 8,
+    "por_severidad": {
+      "info": 8
+    }
+  }
+}

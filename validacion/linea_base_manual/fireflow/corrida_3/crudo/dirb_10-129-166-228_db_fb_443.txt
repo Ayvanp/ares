@@ -1,0 +1,24 @@
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+OUTPUT_FILE: /out/corrida_3/crudo/dirb_10-129-166-228_db_fb_443.txt
+START_TIME: Wed Oct 14 17:04:29 2026
+URL_BASE: https://10.129.166.228/
+WORDLIST_FILES: /usr/share/dirb/wordlists/small.txt
+OPTION: Not Recursive
+OPTION: Silent Mode
+
+-----------------
+
+GENERATED WORDS: 959
+
+---- Scanning URL: https://10.129.166.228/ ----
+(!) WARNING: NOT_FOUND[] not stable, unable to determine correct URLs {30X}.
+    (Try using FineTunning: '-f')
+
+-----------------
+END_TIME: Wed Oct 14 17:04:30 2026
+DOWNLOADED: 0 - FOUND: 0

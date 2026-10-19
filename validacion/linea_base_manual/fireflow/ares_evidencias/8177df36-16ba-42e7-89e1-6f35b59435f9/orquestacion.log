@@ -1,0 +1,25 @@
+[17:04:57] Iniciando orquestación de 10.129.166.228
+[17:04:57] [Nmap] Escaneando 10.129.166.228
+[17:05:29] [Nmap] Completado
+[17:05:29] Primera ronda: 6 tareas
+[17:05:29] [nuclei] Nmap identificó ssh en :22
+[17:06:06] [nuclei] Completado
+[17:06:06] [nuclei] Nmap detectó OpenSSH en :22
+[17:06:18] [nuclei] Completado
+[17:06:18] [whatweb] HTTP en :443
+[17:06:27] [whatweb] Completado
+[17:06:27] [gobuster] HTTP en :443
+[17:06:28] [gobuster] Omitido: Error: the server returns a status code that matches the provided options for non existing urls. https://10.129.166.228/292e0e0a-edf5-47bd-9926-e094d0766c97 => 301 (Length: 162). To continue please exclude the status code or the length
+[17:06:28] [nuclei] HTTP en :443
+[17:08:00] [nuclei] Completado
+[17:08:00] [nuclei] Nmap detectó nginx en :443
+[17:08:10] [nuclei] Completado
+[17:08:10] vHosts descubiertos: fireflow.htb
+[17:08:10] [/etc/hosts] Los hostnames ya estaban en /etc/hosts
+[17:08:10] Segunda/tercera ronda: 4 tareas adicionales
+[17:08:10] [nuclei] nginx  detectado por WhatWeb
+[17:08:24] [dirb] Gobuster no encontró rutas en :443 → dirb como respaldo
+[17:08:25] [whatweb] vHost fireflow.htb en :443
+[17:08:31] [gobuster] vHost fireflow.htb en :443
+[17:08:45] Guardando 10 resultados en BD
+[17:08:46] Orquestación completada. Evidencias en: evidencias/8177df36-16ba-42e7-89e1-6f35b59435f9

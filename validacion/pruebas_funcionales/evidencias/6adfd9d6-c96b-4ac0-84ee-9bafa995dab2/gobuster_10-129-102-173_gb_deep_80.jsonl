@@ -1,0 +1,4 @@
+http://10.129.102.173/capture (Status: 302) [Size: 220] [--> http://10.129.102.173/data/1]
+http://10.129.102.173/data (Status: 302) [Size: 208] [--> http://10.129.102.173/]
+http://10.129.102.173/ip (Status: 200) [Size: 17462]
+http://10.129.102.173/netstat (Status: 200) [Size: 28641]

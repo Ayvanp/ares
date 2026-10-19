@@ -1,0 +1,3 @@
+[
+{"target":"http://10.129.96.69","http_status":200,"request_config":{"headers":{"User-Agent":"WhatWeb/0.6.3"}},"plugins":{"Bootstrap":{},"Country":{"string":["RESERVED"],"module":["ZZ"]},"HTML5":{},"HTTPServer":{"string":["gunicorn"]},"IP":{"string":["10.129.96.69"]},"JQuery":{"version":["2.2.4"]},"Modernizr":{"version":["2.8.3.min"]},"Script":{},"Title":{"string":["Security Dashboard"]},"X-UA-Compatible":{"string":["ie=edge"]}}}
+]

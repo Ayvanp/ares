@@ -1,0 +1,20 @@
+[21:33:12] Iniciando orquestación de 10.129.102.173
+[21:33:12] [Nmap] Escaneando 10.129.102.173
+[21:33:34] [Nmap] Completado
+[21:33:34] Primera ronda: 6 tareas
+[21:33:34] [nuclei] Nmap identificó ftp en :21
+[21:33:47] [nuclei] Completado
+[21:33:47] [nuclei] Nmap identificó ssh en :22
+[21:34:03] [nuclei] Completado
+[21:34:03] [nuclei] Nmap detectó OpenSSH en :22
+[21:34:04] [nuclei] Completado
+[21:34:04] [whatweb] HTTP en :80
+[21:34:07] [whatweb] Completado
+[21:34:07] [dirb] HTTP en :80
+[21:39:07] [dirb] Parcial (timeout después de 300s), rescatando resultados
+[21:39:07] [nuclei] HTTP en :80
+[21:40:07] [nuclei] Completado
+[21:40:07] Segunda/tercera ronda: 1 tareas adicionales
+[21:40:07] [gobuster] dirb encontró solo 1 resultado(s) en :80 → Gobuster más profundo
+[21:45:07] Guardando 8 resultados en BD
+[21:45:07] Orquestación completada. Evidencias en: evidencias/570d5d98-2e70-4642-b3f4-751b9654989f

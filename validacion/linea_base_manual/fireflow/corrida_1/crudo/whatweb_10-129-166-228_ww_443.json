@@ -1,0 +1,3 @@
+[
+{"target":"https://10.129.166.228","http_status":301,"request_config":{"headers":{"User-Agent":"WhatWeb/0.5.5"}},"plugins":{"Country":{"string":["RESERVED"],"module":["ZZ"]},"HTTPServer":{"string":["nginx"]},"IP":{"string":["10.129.166.228"]},"nginx":{},"RedirectLocation":{"string":["https://fireflow.htb/"]},"Title":{"string":["301 Moved Permanently"]}}}
+]

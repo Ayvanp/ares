@@ -1,0 +1,24 @@
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+OUTPUT_FILE: /tmp/ares_04n5z8jl/dirb_10-129-102-173_db_80.txt
+START_TIME: Wed Aug 26 18:09:02 2026
+URL_BASE: http://10.129.102.173/
+WORDLIST_FILES: /usr/share/dirb/wordlists/small.txt
+OPTION: Not Recursive
+OPTION: Silent Mode
+
+-----------------
+
+GENERATED WORDS: 959
+
+---- Scanning URL: http://10.129.102.173/ ----
++ http://10.129.102.173/data (CODE:302|SIZE:208)
++ http://10.129.102.173/netstat (CODE:200|SIZE:27270)
+
+-----------------
+END_TIME: Wed Aug 26 18:13:10 2026
+DOWNLOADED: 959 - FOUND: 2

@@ -1,0 +1,37 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20261014135311
+Username: WIN-4OT0535E4NQ\yapiz
+RunAs User: WIN-4OT0535E4NQ\yapiz
+Configuration Name: 
+Machine: WIN-4OT0535E4NQ (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command $__claudeCodeScript = $env:CLAUDE_CODE_SHELL_LAUNCHER_SCRIPT; $env:CLAUDE_CODE_SHELL_LAUNCHER_SCRIPT = $null; Invoke-Expression -Command $__claudeCodeScript
+Process ID: 30304
+PSVersion: 5.1.26100.9444
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9444
+BuildVersion: 10.0.26100.9444
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+[2026-10-14 13:53:11] ================ Maquina=fireflow  IP=10.129.166.228 ================
+[2026-10-14 13:53:11] >>> MANUAL corrida 1  (salida: corrida_1\)
+
+[2026-10-14 13:58:00] <<< MANUAL corrida 1  exit=0  wall=288.9s
+[2026-10-14 13:58:00] >>> MANUAL corrida 2  (salida: corrida_2\)
+
+[2026-10-14 14:01:21] <<< MANUAL corrida 2  exit=0  wall=200.9s
+[2026-10-14 14:01:21] >>> MANUAL corrida 3  (salida: corrida_3\)
+
+[2026-10-14 14:04:48] <<< MANUAL corrida 3  exit=0  wall=206.6s
+[2026-10-14 14:04:48] >>> ARES: arrancando API...
+[2026-10-14 14:04:56] ARES API arriba. Lanzando escaneo perfil=completo...
+
+[2026-10-14 14:08:49] ARES escaneo exit=0
+[2026-10-14 14:08:50] ================ FIN fireflow  wall_total=15.6min ================
+**********************
+Windows PowerShell transcript end
+End time: 20261014140850
+**********************

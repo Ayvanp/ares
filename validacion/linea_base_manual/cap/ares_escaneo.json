@@ -1,0 +1,88 @@
+{
+  "herramienta_medida": "ARES (API)",
+  "ip": "10.129.166.225",
+  "perfil": "completo",
+  "escaneo_id": "19a18d6c-46f1-4c19-a6ae-9886990c359b",
+  "estado_final": "completed",
+  "creado_en": "2026-10-14 16:40:43.308621",
+  "completado_en": "2026-10-14 16:44:26.451226",
+  "duracion_api_s": 223.143,
+  "duracion_wall_s": 226.67,
+  "n_tareas": 7,
+  "tareas": [
+    {
+      "herramienta": "nmap",
+      "estado": "completed",
+      "comando": "nmap -sV -sC -O -T4 -oX /tmp/ares_0j8vmeqx/nmap.xml 10.129.166.225",
+      "razon": "Escaneo base de puertos, versiones y sistema operativo",
+      "iniciado": "2026-10-14 16:40:43.726994",
+      "terminado": "2026-10-14 16:41:02.371773",
+      "duracion_s": 18.645
+    },
+    {
+      "herramienta": "nuclei_ftp_21",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.225:21 -tags ftp -jsonl -o /tmp/ares_0j8vmeqx/nuclei_10-129-166-225_ftp_21.jsonl -silent",
+      "razon": "Nmap identificó ftp en :21",
+      "iniciado": "2026-10-14 16:41:02.498085",
+      "terminado": "2026-10-14 16:42:03.411639",
+      "duracion_s": 60.914
+    },
+    {
+      "herramienta": "nuclei_ssh_22",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.225:22 -tags ssh -jsonl -o /tmp/ares_0j8vmeqx/nuclei_10-129-166-225_ssh_22.jsonl -silent",
+      "razon": "Nmap identificó ssh en :22",
+      "iniciado": "2026-10-14 16:42:03.554935",
+      "terminado": "2026-10-14 16:42:28.279620",
+      "duracion_s": 24.725
+    },
+    {
+      "herramienta": "nuclei_openssh_22",
+      "estado": "completed",
+      "comando": "nuclei -target 10.129.166.225:22 -tags openssh -jsonl -o /tmp/ares_0j8vmeqx/nuclei_10-129-166-225_openssh_22.jsonl -silent",
+      "razon": "Nmap detectó OpenSSH en :22",
+      "iniciado": "2026-10-14 16:42:28.328152",
+      "terminado": "2026-10-14 16:42:38.416443",
+      "duracion_s": 10.088
+    },
+    {
+      "herramienta": "whatweb_ww_80",
+      "estado": "completed",
+      "comando": "whatweb http://10.129.166.225 --log-json /tmp/ares_0j8vmeqx/whatweb_10-129-166-225_ww_80.json --no-errors",
+      "razon": "HTTP en :80",
+      "iniciado": "2026-10-14 16:42:38.518129",
+      "terminado": "2026-10-14 16:42:42.471906",
+      "duracion_s": 3.954
+    },
+    {
+      "herramienta": "gobuster_gb_80",
+      "estado": "completed",
+      "comando": "gobuster dir -u http://10.129.166.225 -w /usr/share/dirb/wordlists/big.txt --no-progress -o /tmp/ares_0j8vmeqx/gobuster_10-129-166-225_gb_80.jsonl -q -t 80 -e -b 404,500,503 --timeout 15s",
+      "razon": "HTTP en :80",
+      "iniciado": "2026-10-14 16:42:42.565775",
+      "terminado": "2026-10-14 16:43:31.710889",
+      "duracion_s": 49.145
+    },
+    {
+      "herramienta": "nuclei_http_80",
+      "estado": "completed",
+      "comando": "nuclei -target http://10.129.166.225 -tags http,exposure,misconfig -jsonl -o /tmp/ares_0j8vmeqx/nuclei_10-129-166-225_http_80.jsonl -silent",
+      "razon": "HTTP en :80",
+      "iniciado": "2026-10-14 16:43:31.757566",
+      "terminado": "2026-10-14 16:44:26.214011",
+      "duracion_s": 54.456
+    }
+  ],
+  "resumen": {
+    "activos": 1,
+    "servicios": 3,
+    "tecnologias": 4,
+    "endpoints": 4,
+    "hallazgos": 10,
+    "por_severidad": {
+      "medium": 1,
+      "info": 9
+    }
+  }
+}

@@ -1,0 +1,3 @@
+[
+{"target":"http://127.0.0.1:8000","http_status":200,"request_config":{"headers":{"User-Agent":"WhatWeb/0.6.3"}},"plugins":{"Country":{"string":["RESERVED"],"module":["ZZ"]},"HTTPServer":{"string":["uvicorn"]},"IP":{"string":["127.0.0.1"]}}}
+]
