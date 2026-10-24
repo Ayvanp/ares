@@ -19,6 +19,7 @@ INFORME_*.html
 *.ovpn
 .env
 .env.*
+!.env.example
 
 # Documentos de la tesis y material de terceros
 *.docx

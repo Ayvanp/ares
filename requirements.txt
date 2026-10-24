@@ -6,3 +6,7 @@ fastapi>=0.100
 uvicorn>=0.20
 python-multipart>=0.0.5
 httpx>=0.24
+
+# Driver de PostgreSQL. Solo se usa si ARES_DATABASE_URL apunta a postgres://;
+# en desarrollo con SQLite no hace falta, pero no estorba tenerlo instalado.
+psycopg[binary]>=3.1

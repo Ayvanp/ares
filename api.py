@@ -5,14 +5,22 @@ Para ejecutar:
     python api.py
 
 Documentación interactiva en: http://localhost:8000/docs
+
+Autenticación (Etapa 0): la API ya NO es abierta. Toda petición (salvo la raíz
+y /salud) exige un token en la cabecera `Authorization: Bearer <token>` o
+`X-API-Key: <token>`. Para el arranque inicial se acepta el valor de la variable
+de entorno `ARES_API_TOKEN` como token admin; con él se crean tokens con nombre.
+Los escaneos activos solo arrancan bajo un engagement vigente y contra un
+objetivo dentro de su alcance autorizado (compuerta dura), y todo intento queda
+en la tabla de auditoría.
 """
 
-import json
 import os
 import tempfile
-from datetime import datetime
 
-from fastapi import FastAPI, UploadFile, File, Query, HTTPException, BackgroundTasks
+from fastapi import (
+    FastAPI, UploadFile, File, Query, HTTPException, Header, Depends, Request,
+)
 from fastapi.responses import FileResponse
 
 from parsers.nmap import parsear_nmap
@@ -23,35 +31,182 @@ from parsers.dirb import parsear_dirb
 from base_datos.conexion import BaseDatos
 from base_datos.operaciones import (
     guardar_resultado, guardar_resultado_combinado,
-    obtener_todos_los_escaneos, obtener_activos_de_escaneo,
-    obtener_hallazgos_por_severidad, obtener_resumen,
-    buscar_duplicados, obtener_correlaciones,
-    obtener_resumen_correlacion, guardar_correlacion,
-    guardar_resultados_en_escaneo,
-    comparar_escaneos, escaneo_anterior_mismo_objetivo,
+    obtener_todos_los_escaneos, obtener_resumen,
+    obtener_correlaciones, obtener_resumen_correlacion,
+    comparar_escaneos,
 )
+from base_datos import gestion
 from base_datos.tablas import (
     TablaEscaneo, TablaTarea, TablaActivo, TablaServicio,
     TablaTecnologia, TablaEndpoint, TablaHallazgo, TablaEvidencia,
-    generar_id, hora_actual,
+    hora_actual,
 )
 from orquestador import orquestar, PERFILES, herramienta_disponible
-
-app = FastAPI(title="ARES API", description="Sistema automatizado de evaluación de seguridad", version="1.0.0")
+from cola import ColaEscaneos
+from autenticacion import (
+    identidad_de_token, extraer_token, crear_token, listar_tokens, revocar_token,
+)
 
 URL_BD = os.environ.get("ARES_DATABASE_URL", "sqlite:///ares.db")
 bd = BaseDatos(URL_BD)
 bd.crear_tablas()
 
+# Cola de escaneos (pool de hilos en el mismo proceso). Número de trabajadores
+# configurable; por defecto 1 (FIFO serializado), robusto sobre SQLite.
+cola = ColaEscaneos(bd, runner=orquestar,
+                    trabajadores=int(os.environ.get("ARES_TRABAJADORES", "1")))
+
 PARSERS = {"nmap": parsear_nmap, "whatweb": parsear_whatweb,
            "gobuster": parsear_gobuster, "nuclei": parsear_nuclei,
            "dirb": parsear_dirb}
 
+RUTAS_ABIERTAS = {"/", "/salud", "/docs", "/redoc", "/openapi.json"}
+
+
+# ── Autenticación ──
+
+async def autenticar(request: Request,
+                     authorization: str = Header(default=None),
+                     x_api_key: str = Header(default=None, alias="X-API-Key")):
+    """Dependencia global: valida el token salvo en las rutas abiertas."""
+    if request.url.path in RUTAS_ABIERTAS:
+        return None
+    identidad = identidad_de_token(bd, extraer_token(authorization, x_api_key))
+    if not identidad:
+        raise HTTPException(status_code=401,
+                            detail="Token inválido o ausente. Usa Authorization: Bearer <token>.")
+    request.state.identidad = identidad
+    return identidad
+
+
+def identidad_actual(request: Request):
+    return getattr(request.state, "identidad", None) or {"nombre": "desconocido", "es_admin": False}
+
+
+def requiere_admin(request: Request):
+    ident = getattr(request.state, "identidad", None)
+    if not ident or not ident.get("es_admin"):
+        raise HTTPException(status_code=403, detail="Esta operación requiere un token admin")
+    return ident
+
+
+app = FastAPI(title="ARES API",
+              description="Sistema automatizado de evaluación de seguridad",
+              version="1.1.0",
+              dependencies=[Depends(autenticar)])
+
 
 @app.get("/")
 def inicio():
-    return {"nombre": "ARES", "version": "1.0.0",
-            "herramientas": list(PARSERS.keys())}
+    return {"nombre": "ARES", "version": "1.1.0",
+            "herramientas": list(PARSERS.keys()),
+            "autenticacion": "requerida (Bearer token / X-API-Key)"}
+
+
+@app.get("/salud")
+def salud():
+    return {"estado": "ok", "escaneos_en_cola": cola.pendientes()}
+
+
+# ── Tokens (admin) ──
+
+@app.post("/tokens")
+def crear_token_api(nombre: str = Query(description="Nombre descriptivo del token"),
+                    admin: bool = Query(default=False),
+                    _=Depends(requiere_admin)):
+    datos = crear_token(bd, nombre, es_admin=admin)
+    return {"mensaje": "Token creado. Guárdalo ahora: no se vuelve a mostrar.",
+            **datos}
+
+
+@app.get("/tokens")
+def listar_tokens_api(_=Depends(requiere_admin)):
+    return {"tokens": listar_tokens(bd)}
+
+
+@app.delete("/tokens/{token_id}")
+def revocar_token_api(token_id: str, _=Depends(requiere_admin)):
+    if not revocar_token(bd, token_id):
+        raise HTTPException(status_code=404, detail="Token no encontrado")
+    return {"mensaje": "Token revocado", "id": token_id}
+
+
+# ── Clientes y engagements (admin) ──
+
+@app.post("/clientes")
+def crear_cliente_api(nombre: str = Query(), notas: str = Query(default=None),
+                      _=Depends(requiere_admin)):
+    return gestion.crear_cliente(bd, nombre, notas)
+
+
+@app.get("/clientes")
+def listar_clientes_api():
+    return {"clientes": gestion.listar_clientes(bd)}
+
+
+@app.post("/engagements")
+def crear_engagement_api(cliente_id: str = Query(), nombre: str = Query(),
+                         ventana_inicio: str = Query(default=None),
+                         ventana_fin: str = Query(default=None),
+                         _=Depends(requiere_admin)):
+    try:
+        return gestion.crear_engagement(bd, cliente_id, nombre, ventana_inicio, ventana_fin)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/engagements")
+def listar_engagements_api():
+    return {"engagements": gestion.listar_engagements(bd)}
+
+
+@app.get("/engagements/{engagement_id}")
+def detalle_engagement_api(engagement_id: str):
+    eng = gestion.obtener_engagement(bd, engagement_id)
+    if not eng:
+        raise HTTPException(status_code=404, detail="Engagement no encontrado")
+    return eng
+
+
+@app.post("/engagements/{engagement_id}/alcance")
+def agregar_alcance_api(engagement_id: str,
+                        tipo: str = Query(description="ip, cidr, hostname o dominio"),
+                        valor: str = Query(),
+                        _=Depends(requiere_admin)):
+    try:
+        return gestion.agregar_alcance(bd, engagement_id, tipo, valor)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/engagements/{engagement_id}/activar")
+def activar_engagement_api(engagement_id: str,
+                           nda_firmado: bool = Query(),
+                           roe_firmado: bool = Query(),
+                           _=Depends(requiere_admin)):
+    try:
+        return gestion.activar_engagement(bd, engagement_id, nda_firmado, roe_firmado)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/engagements/{engagement_id}/cerrar")
+def cerrar_engagement_api(engagement_id: str, _=Depends(requiere_admin)):
+    r = gestion.cerrar_engagement(bd, engagement_id)
+    if not r:
+        raise HTTPException(status_code=404, detail="Engagement no encontrado")
+    return r
+
+
+@app.get("/engagements/{engagement_id}/auditoria")
+def auditoria_engagement_api(engagement_id: str):
+    return {"engagement_id": engagement_id,
+            "auditoria": gestion.listar_auditoria(bd, engagement_id=engagement_id)}
+
+
+@app.get("/auditoria")
+def auditoria_api(_=Depends(requiere_admin)):
+    return {"auditoria": gestion.listar_auditoria(bd)}
 
 
 # ── Escaneos ──
@@ -61,7 +216,8 @@ def listar_escaneos():
     escaneos = obtener_todos_los_escaneos(bd)
     return {"total": len(escaneos), "escaneos": [
         {"id": e.id, "objetivo": e.objetivo, "perfil": e.perfil,
-         "estado": e.estado, "creado_en": str(e.creado_en) if e.creado_en else None}
+         "estado": e.estado, "engagement_id": e.engagement_id,
+         "creado_en": str(e.creado_en) if e.creado_en else None}
         for e in escaneos]}
 
 
@@ -104,7 +260,8 @@ def detalle_escaneo(escaneo_id: str):
         })
     sesion.close()
     return {"id": escaneo.id, "objetivo": escaneo.objetivo, "perfil": escaneo.perfil,
-            "estado": escaneo.estado, "creado_en": str(escaneo.creado_en) if escaneo.creado_en else None,
+            "estado": escaneo.estado, "engagement_id": escaneo.engagement_id,
+            "creado_en": str(escaneo.creado_en) if escaneo.creado_en else None,
             "tareas": [{"herramienta": t.nombre_herramienta, "estado": t.estado} for t in tareas],
             "activos": lista_activos}
 
@@ -176,26 +333,47 @@ def listar_perfiles():
 
 @app.post("/escaneos/iniciar")
 def iniciar_escaneo(
-    target: str = Query(description="IP o rango a escanear"),
+    request: Request,
+    engagement_id: str = Query(description="Engagement autorizado bajo el que se escanea"),
+    target: str = Query(description="IP o host a escanear (debe estar en el alcance)"),
     perfil: str = Query(default="completo"),
-    background_tasks: BackgroundTasks = None,
 ):
+    """
+    Compuerta dura: solo arranca si el engagement está vigente y el objetivo
+    está dentro de su alcance. Todo intento (permitido o denegado) se audita.
+    """
+    actor = identidad_actual(request)["nombre"]
     if perfil not in PERFILES:
         raise HTTPException(status_code=400, detail="Perfil inválido: " + ", ".join(PERFILES.keys()))
+
+    evaluacion = gestion.evaluar_autorizacion(bd, engagement_id, target)
+    if not evaluacion["existe"]:
+        gestion.registrar_auditoria(bd, actor, "escaneo.iniciar", objetivo=target,
+            engagement_id=engagement_id, resultado="denegado", detalle="Engagement inexistente")
+        raise HTTPException(status_code=404, detail="Engagement no encontrado")
+    if not evaluacion["ok"]:
+        gestion.registrar_auditoria(bd, actor, "escaneo.iniciar", objetivo=target,
+            engagement_id=engagement_id, resultado="denegado", detalle=evaluacion["motivo"])
+        raise HTTPException(status_code=403, detail="Fuera de alcance: " + evaluacion["motivo"])
+
     sesion = bd.nueva_sesion()
     try:
-        escaneo = TablaEscaneo(objetivo=target, perfil=perfil,
-            estado="pending", creado_en=hora_actual())
+        escaneo = TablaEscaneo(objetivo=target, perfil=perfil, estado="pending",
+            engagement_id=engagement_id, creado_en=hora_actual())
         sesion.add(escaneo); sesion.flush()
         sesion.add(TablaTarea(escaneo_id=escaneo.id, nombre_herramienta="nmap", estado="pending"))
         sesion.commit()
         escaneo_id = escaneo.id
     finally:
         sesion.close()
-    background_tasks.add_task(orquestar, target=target, perfil_nombre=perfil,
-        bd=bd, escaneo_id=escaneo_id)
+
+    gestion.registrar_auditoria(bd, actor, "escaneo.iniciar", objetivo=target,
+        engagement_id=engagement_id, escaneo_id=escaneo_id, resultado="permitido",
+        detalle="Perfil " + perfil)
+    cola.encolar(escaneo_id, target, perfil)
     return {"escaneo_id": escaneo_id, "target": target, "perfil": perfil,
-            "estado": "pending", "mensaje": "Escaneo iniciado. Usa GET /escaneos/" + escaneo_id + "/estado"}
+            "engagement_id": engagement_id, "estado": "queued",
+            "mensaje": "Escaneo en cola. Usa GET /escaneos/" + escaneo_id + "/estado"}
 
 
 @app.get("/herramientas/estado")
