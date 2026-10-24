@@ -1,0 +1,34 @@
+# Variante con PostgreSQL para producción/pruebas más cercanas a producción.
+# Uso:  docker compose -f docker-compose.postgres.yml up --build -d
+#
+# Levanta Postgres y ARES conectado a él. La API sigue en el puerto 8000.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ares
+      POSTGRES_PASSWORD: ares
+      POSTGRES_DB: ares
+    volumes:
+      - ares_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ares"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ares:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ARES_DATABASE_URL: postgresql+psycopg://ares:ares@db:5432/ares
+      # Define un token admin de arranque (cámbialo):
+      ARES_API_TOKEN: ${ARES_API_TOKEN:-cambia-este-token}
+      ARES_TRABAJADORES: ${ARES_TRABAJADORES:-2}
+    ports:
+      - "8000:8000"
+
+volumes:
+  ares_pgdata:

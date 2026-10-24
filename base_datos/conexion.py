@@ -6,11 +6,18 @@ from base_datos.tablas import Base
 # tablas que ya existen, así que las añadimos a mano en BDs viejas.
 COLUMNAS_NUEVAS = {
     "tareas": {"razon": "TEXT"},
+    "escaneos": {"engagement_id": "VARCHAR(36)"},
 }
 
 class BaseDatos:
     def __init__(self, url="sqlite:///ares.db"):
-        self.engine = create_engine(url)
+        # SQLite: la cola de escaneos usa hilos trabajadores, así que la
+        # conexión tiene que poder compartirse entre hilos. Para Postgres y
+        # otros motores activamos pre-ping para no arrastrar conexiones muertas.
+        if url.startswith("sqlite"):
+            self.engine = create_engine(url, connect_args={"check_same_thread": False})
+        else:
+            self.engine = create_engine(url, pool_pre_ping=True)
         self.Sesion = sessionmaker(bind=self.engine, expire_on_commit=False)
     def crear_tablas(self):
         Base.metadata.create_all(self.engine)

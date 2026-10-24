@@ -5,7 +5,7 @@ import argparse, itertools, json, os, re, sys, time, urllib.request, urllib.erro
 from datetime import datetime
 
 ARCHIVO_CONFIG = os.path.expanduser("~/.ares_config.json")
-CONFIG_DEFAULT = {"servidor": "http://localhost:8000", "escaneo_actual": None}
+CONFIG_DEFAULT = {"servidor": "http://localhost:8000", "escaneo_actual": None, "token": None}
 ANCHO = 54  # ancho de las reglas
 
 def cargar_config():
@@ -67,8 +67,11 @@ def llamar_api(metodo, ruta, datos=None, config=None):
     url = config["servidor"].rstrip("/") + ruta
     try:
         cuerpo = json.dumps(datos).encode() if datos else None
+        cabeceras = {"Content-Type": "application/json"}
+        token = config.get("token") or os.environ.get("ARES_API_TOKEN")
+        if token: cabeceras["Authorization"] = "Bearer " + token
         req = urllib.request.Request(url, data=cuerpo,
-            headers={"Content-Type": "application/json"}, method=metodo)
+            headers=cabeceras, method=metodo)
         with urllib.request.urlopen(req, timeout=10) as resp:
             return json.loads(resp.read())
     except urllib.error.HTTPError as e:
@@ -151,9 +154,17 @@ def _mostrar_resumen(resumen):
 # ── Comandos ──
 def cmd_iniciar(args, config):
     target = args.target; perfil = getattr(args, "perfil", "completo")
+    engagement = getattr(args, "engagement", None) or config.get("engagement_actual")
+    if not engagement:
+        print(); print("  " + rojo("✗ Falta el engagement autorizado."))
+        hint("Indicá uno:  ares iniciar " + target + " --engagement <ID>")
+        hint("El engagement debe estar activo (NDA + RoE) y cubrir el objetivo en su alcance.")
+        print(); sys.exit(1)
     encabezado("Nuevo escaneo", target)
     campo("Perfil", perfil + dim("  (" + PERFIL_DESC.get(perfil, "") + ")"))
-    respuesta = post("/escaneos/iniciar", {"target": target, "perfil": perfil}, config=config)
+    campo("Engagement", dim(engagement[:8] + "…"))
+    respuesta = post("/escaneos/iniciar",
+        {"engagement_id": engagement, "target": target, "perfil": perfil}, config=config)
     escaneo_id = respuesta["escaneo_id"]
     config["escaneo_actual"] = escaneo_id; guardar_config(config)
     campo("ID", dim(escaneo_id[:8] + "…"))
@@ -323,7 +334,11 @@ def cmd_reporte(args, config):
     servidor = config["servidor"].rstrip("/")
     encabezado("Generar informe")
     def _descargar(sufijo, nombre):
-        req = urllib.request.Request(servidor + "/escaneos/" + escaneo_id + sufijo, method="POST")
+        cabeceras = {}
+        token = config.get("token") or os.environ.get("ARES_API_TOKEN")
+        if token: cabeceras["Authorization"] = "Bearer " + token
+        req = urllib.request.Request(servidor + "/escaneos/" + escaneo_id + sufijo,
+            headers=cabeceras, method="POST")
         with urllib.request.urlopen(req, timeout=30) as resp:
             with open(nombre, "wb") as f: f.write(resp.read())
     try:
@@ -420,6 +435,23 @@ def cmd_herramientas(args, config):
         print("  " + amarillo("! Nmap no está instalado — no se puede orquestar"))
     print()
 
+def cmd_token(args, config):
+    """Guarda el token de API que el CLI enviará en cada petición."""
+    config["token"] = args.valor; guardar_config(config)
+    encabezado("Token de API")
+    print("  " + verde("✓ Token guardado") + dim("  (se enviará como Authorization: Bearer …)"))
+    print()
+
+
+def cmd_engagement(args, config):
+    """Fija el engagement activo que usará 'iniciar' por defecto."""
+    config["engagement_actual"] = args.id; guardar_config(config)
+    encabezado("Engagement activo")
+    print("  " + verde("✓ Engagement guardado  ") + dim(args.id))
+    hint("Los próximos 'ares iniciar' lo usarán salvo que pases --engagement")
+    print()
+
+
 def cmd_servidor(args, config):
     config["servidor"] = args.url.rstrip("/"); guardar_config(config)
     encabezado("Servidor")
@@ -439,7 +471,7 @@ def mostrar_ayuda():
     print()
     grupos = [
         ("Escaneo", [
-            ("iniciar <ip> [--perfil P]", "Lanza un escaneo y sigue el progreso"),
+            ("iniciar <ip> --engagement <ID>", "Lanza un escaneo bajo un engagement autorizado"),
             ("estado", "Cronología del escaneo actual (con comandos)"),
             ("ver", "Servicios, tecnologías y hallazgos"),
         ]),
@@ -455,6 +487,8 @@ def mostrar_ayuda():
             ("hosts [--limpiar]", "vHosts que ARES puso en /etc/hosts"),
             ("herramientas", "Estado de las herramientas del servidor"),
             ("servidor <url>", "Apunta el CLI a otro servidor"),
+            ("token <valor>", "Guarda el token de API para autenticar"),
+            ("engagement <ID>", "Fija el engagement activo por defecto"),
         ]),
     ]
     for titulo, items in grupos:
@@ -473,6 +507,7 @@ def main():
     subparsers = parser.add_subparsers(dest="comando")
     p = subparsers.add_parser("iniciar", help="Lanza un escaneo"); p.add_argument("target")
     p.add_argument("--perfil", default="completo", choices=["reconocimiento", "rapido", "completo"])
+    p.add_argument("--engagement", default=None, help="ID del engagement autorizado")
     p = subparsers.add_parser("estado", help="Estado y cronología del escaneo"); p.add_argument("--id", default=None)
     p = subparsers.add_parser("hallazgos", help="Lista de hallazgos")
     p.add_argument("--severidad", choices=["critical", "high", "medium", "low", "info"], default=None)
@@ -486,12 +521,15 @@ def main():
     p = subparsers.add_parser("hosts", help="vHosts en /etc/hosts"); p.add_argument("--limpiar", action="store_true")
     subparsers.add_parser("herramientas", help="Estado de las herramientas")
     p = subparsers.add_parser("servidor", help="Configura el servidor"); p.add_argument("url")
+    p = subparsers.add_parser("token", help="Guarda el token de API"); p.add_argument("valor")
+    p = subparsers.add_parser("engagement", help="Fija el engagement activo por defecto"); p.add_argument("id")
     args = parser.parse_args()
     if not args.comando: mostrar_ayuda(); return
     comandos = {"iniciar": cmd_iniciar, "estado": cmd_estado, "hallazgos": cmd_hallazgos,
         "correlacion": cmd_correlacion, "escaneos": cmd_escaneos, "ver": cmd_ver,
         "reporte": cmd_reporte, "evidencia": cmd_evidencia, "comparar": cmd_comparar,
-        "hosts": cmd_hosts, "herramientas": cmd_herramientas, "servidor": cmd_servidor}
+        "hosts": cmd_hosts, "herramientas": cmd_herramientas, "servidor": cmd_servidor,
+        "token": cmd_token, "engagement": cmd_engagement}
     fn = comandos.get(args.comando)
     if fn: fn(args, config)
 

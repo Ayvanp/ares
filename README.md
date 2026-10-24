@@ -4,6 +4,13 @@ Sistema que orquesta Nmap, WhatWeb, Gobuster, dirb y Nuclei,
 normaliza sus resultados en un modelo canónico, los correlaciona
 automáticamente y genera reportes HTML y CSV.
 
+Desde la Etapa 0, la API exige **autenticación por token** y ningún escaneo
+activo arranca sin un **engagement autorizado** (NDA + RoE firmados y ventana
+horaria vigente) que cubra el objetivo en su **alcance**. Es una compuerta
+dura: todo intento, permitido o denegado, queda en una **auditoría** de solo
+agregar. Los escaneos corren en una **cola** asíncrona y la base de datos puede
+ser SQLite (desarrollo) o PostgreSQL (producción).
+
 ---
 
 ## Requisitos
@@ -58,6 +65,33 @@ Deberías ver todas las herramientas como "instalada".
 
 ---
 
+## Autenticación y alcance autorizado (Etapa 0)
+
+La API dejó de ser abierta. Antes de escanear hay que (1) tener un token y
+(2) dejar un engagement activo que cubra el objetivo. Todo esto se hace una vez,
+con el CLI de administración local `ares_admin.py` (opera directo sobre la BD,
+no necesita un token previo):
+
+```bash
+# 1. Crear un token admin y apuntarlo en el CLI
+python ares_admin.py token-crear "admin" --admin        # imprime el token una sola vez
+python ares.py token ares_XXXXXXXX...                    # lo guarda en ~/.ares_config.json
+
+# 2. Registrar cliente y engagement, definir alcance y activarlo
+python ares_admin.py cliente-crear "Laboratorio HTB"
+python ares_admin.py engagement-crear <cliente_id> "Máquinas HTB"
+python ares_admin.py alcance-agregar <engagement_id> cidr 10.129.0.0/16
+python ares_admin.py engagement-activar <engagement_id> --nda --roe
+python ares.py engagement <engagement_id>                # engagement por defecto del CLI
+```
+
+El engagement solo se puede activar con NDA y RoE marcados y al menos una
+entrada de alcance. Tipos de alcance: `ip`, `cidr`, `hostname`, `dominio`
+(este último cubre subdominios). Un escaneo contra un objetivo fuera del
+alcance, o con el engagement no vigente, se rechaza con `403` y queda auditado.
+
+Revisa la auditoría en `GET /engagements/<id>/auditoria` o `GET /auditoria`.
+
 ## Uso con HackTheBox
 
 ### 1. Conectar la VPN de HTB
@@ -68,9 +102,14 @@ sudo openvpn tu_archivo.ovpn
 
 ### 2. Iniciar un escaneo
 
+Con el token y el engagement ya configurados (ver sección anterior):
+
 ```bash
-python ares.py iniciar 10.129.244.208 --perfil completo
+python ares.py iniciar 10.129.244.208 --perfil completo --engagement <engagement_id>
 ```
+
+(Si fijaste el engagement por defecto con `ares engagement <id>`, puedes omitir
+`--engagement`.)
 
 El CLI muestra el progreso en tiempo real. Al terminar:
 
@@ -101,7 +140,7 @@ python ares.py reporte
 ## Comandos del CLI
 
 ```bash
-ares iniciar <target> [--perfil completo|rapido|reconocimiento]
+ares iniciar <target> --engagement <ID> [--perfil completo|rapido|reconocimiento]
 ares estado [--id UUID]
 ares hallazgos [--severidad critical|high|medium|low|info]
 ares correlacion [--id UUID]
@@ -110,6 +149,18 @@ ares escaneos
 ares reporte [--id UUID]
 ares herramientas
 ares servidor <url>
+ares token <valor>           # guarda el token de API
+ares engagement <ID>         # fija el engagement activo por defecto
+```
+
+Gestión local (sobre la BD, sin pasar por la API):
+
+```bash
+ares_admin token-crear <nombre> [--admin]
+ares_admin cliente-crear <nombre>
+ares_admin engagement-crear <cliente_id> <nombre> [--ventana-inicio ISO] [--ventana-fin ISO]
+ares_admin alcance-agregar <engagement_id> <ip|cidr|hostname|dominio> <valor>
+ares_admin engagement-activar <engagement_id> --nda --roe
 ```
 
 ---
@@ -118,8 +169,12 @@ ares servidor <url>
 
 ```
 ares/
-  api.py              API REST (FastAPI)
+  api.py              API REST (FastAPI) con autenticación y compuerta de alcance
   ares.py             CLI del auditor
+  ares_admin.py       CLI local de gestión (tokens, clientes, engagements)
+  autenticacion.py    Tokens de API (hash SHA-256, Bearer / X-API-Key)
+  alcance.py          Compuerta de alcance y vigencia del engagement
+  cola.py             Cola asíncrona de escaneos (pool de hilos)
   modelos.py          Modelo canónico
   correlacion.py      Motor de correlación
   orquestador.py      Orquestador reactivo
@@ -131,9 +186,10 @@ ares/
     nuclei.py         Parser JSONL con deduplicación
     dirb.py           Parser de texto plano
   base_datos/
-    tablas.py         10 tablas SQLAlchemy
+    tablas.py         Tablas SQLAlchemy (incluye clientes, engagements, alcance, tokens, auditoría)
     conexion.py       Conexión SQLite/PostgreSQL
-    operaciones.py    Guardado y consultas
+    operaciones.py    Guardado y consultas de resultados
+    gestion.py        Clientes, engagements, alcance y auditoría
   reportes/
     generador.py      HTML y CSV
   Dockerfile
@@ -188,11 +244,11 @@ docker cp ares-server:/app/evidencias ./evidencias_local/
 O acceder directamente a la API:
 
 ```bash
-# Ver todos los escaneos
-curl http://localhost:8000/escaneos | python3 -m json.tool
+# Ver todos los escaneos (requiere token)
+curl -H "Authorization: Bearer $ARES_TOKEN" http://localhost:8000/escaneos | python3 -m json.tool
 
 # Descargar reporte HTML
-curl -X POST http://localhost:8000/escaneos/<ID>/reporte/html -o reporte.html
+curl -X POST -H "Authorization: Bearer $ARES_TOKEN" http://localhost:8000/escaneos/<ID>/reporte/html -o reporte.html
 ```
 
 ---
@@ -212,7 +268,7 @@ La API queda en <http://localhost:8000> y su documentación interactiva en
 datos en `data/`, las evidencias en `evidencias/` y los reportes en
 `reportes/salida/`, dentro de esta carpeta del proyecto.
 
-Para comprobar las herramientas y ejecutar la suite incluida:
+Para comprobar las herramientas y ejecutar la suite incluida (184 pruebas):
 
 ```powershell
 docker compose -f docker-compose.windows.yml exec ares python ares.py herramientas
@@ -242,7 +298,7 @@ de red configuradas.
 
 ```bash
 # Desde el directorio del proyecto (sin Docker)
-python -m unittest discover tests -v   # 162 pruebas
+python -m unittest discover tests -v   # 184 pruebas
 ```
 
 En Windows, ejecuta la misma suite dentro del contenedor con el comando de la
